@@ -40,7 +40,6 @@ export const getLogin = async (req, res) => {
         if (err) throw err
         res.cookie('token', token, { sameSite: 'none', secure: 'true' }).status(200).json({ id, username, nombres, apellidos, token })
       })
-	console.log(`Logueado: ${nombres} - User: ${username}`)
     } else {
       res.status(401).json({
         error: 'Contraseña Incorrecta',
@@ -58,7 +57,7 @@ export const getLogin = async (req, res) => {
 // TODO: /register
 export const createUser = async (req, res) => {
   const { names, lastNames, document } = req.body
- 
+
   try {
     const [result] = await connectMysql.query(`SELECT * FROM login WHERE documento = '${document}'`)
 
@@ -72,7 +71,6 @@ export const createUser = async (req, res) => {
 
       if (UserCreado.affectedRows === 1) {
         res.status(201).json({ message: 'Usuario Registrado Correctamente' })
-	console.log(`Usuario Registrado: ${names} - User: ${username}`)
       } else {
         res.status(500).json({ message: 'Usuario No Creado' })
       }
