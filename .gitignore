@@ -1,2 +1,4 @@
 node_modules
 .vscode-root
+.env
+iniciarapi.sh
