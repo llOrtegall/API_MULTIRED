@@ -3,10 +3,11 @@ create database datauser;
 use datauser;
 use clientes;
 
-CREATE TABLE IF NOT EXISTS `login` (
+CREATE TABLE `login` (
   `id` BINARY(16) PRIMARY KEY DEFAULT (UUID_TO_BIN(UUID())),
   `username` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
+  `documento` INT NOT NULL,
   `nombres` varchar(50) NOT NULL,
   `apellidos` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -31,7 +32,7 @@ CREATE TABLE IF NOT EXISTS `personayumbo` (
   `fregistro` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO `personayumbo` (`cedula`, `nombre`, `telefono`, `correo`, `telwhats`, `fregistro`) VALUES (1118307852, 'Ivan Ortega Garzón', '3202191681', 'IvanOrtega_97@hotmail.com', '573174420518', '2023-09-18');
+INSERT INTO `personayumbo` (`cedula`, `nombre`, `telefono`, `correo`, `telwhats`, `fregistro`) VALUES (66910154, 'Andrea Victoria', '312547856', 'IvanOrtega_97@hotmail.com', '573174420518', '2023-09-18');
 
 SELECT * FROM personayumbo;
 SELECT * FROM cliente;

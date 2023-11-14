@@ -1,5 +1,6 @@
 import { validateUser } from '../../schemas/userSchema.js'
 import { connectMysql } from '../db.js'
+import { resportEmail } from '../services/funtionsReutilizables.js'
 
 // TODO: trae los clientes registrados en x chatBoot
 export const getClientes = async (req, res) => {
@@ -47,6 +48,17 @@ export const updateCliente = async (req, res) => {
     console.error(error)
     res.status(500).json({ error: 'Error al actualizar el cliente' })
   }
+}
+
+// TODO: Función que reporta a un correo para eliminar Registro
+export const reportCliente = async (req, res) => {
+  const data = req.body
+
+  if (data.motivo === '') {
+    res.status(400).json({ message: 'El motivo es obligatorio' })
+  }
+  resportEmail({ data })
+  res.status(200).json({ message: 'Solicitud Enviada' })
 }
 
 // TODO: Función que elimina el cliente en Chat Boot

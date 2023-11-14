@@ -1,16 +1,4 @@
-export function htmlSend ({ nombre, cedula, telefono }) {
-  function getLastThreeChars (str) {
-    str = str.toString()
-    if (typeof str !== 'string') {
-      console.error('Error: str is not a string')
-      return
-    }
-    return str.slice(-3)
-  }
-
-  const cc3 = getLastThreeChars(cedula)
-  const tel3 = getLastThreeChars(telefono)
-
+export function htmlSend ({ nombre, cedula, telefono, motivo }) {
   return (
     `
     <!DOCTYPE html>
@@ -60,19 +48,16 @@ export function htmlSend ({ nombre, cedula, telefono }) {
     </head>
     <body>
       <div class="container">
-        <h2>Confirmación De Cliente Fiel</h1>
+        <h2>Solicitud Eliminación Registro</h1>
     
-          <h3>Información De Usuario Creada:</h3>
-          <p class="pnombres"><strong>Nombre:</strong> ${nombre} | <strong>Cedula:</strong> ******${cc3} | <strong>Telefono:</strong> *****${tel3}</p>
+          <h3>Información De Usuario Recibida:</h3>
+          <p class="pnombres"><strong>Nombre:</strong> ${nombre} | <strong>Cedula:</strong> ${cedula} | <strong>Telefono:</strong> *****${telefono}</p>
     
           <p class="pmain">
-            Estimado(a) <span class="span1">${nombre}</span>,
+            Motivo Eliminación(a) <span class="span1">${motivo}</span>,
           
-            Nos complace informarle que su solicitud para crear una cuenta de Cliente Fiel con el Grupo Empresarial Multired SA (Gane Yumbo) ha sido procesada con éxito.
-          
-            Como titular de una cuenta de Cliente Fiel, ahora puede acumular puntos cada vez que compre formularios de Azar (Chance). en nuestros puntos de venta autorizados en el municipio de Yumbo. 
-          
-            Agradecemos su preferencia y esperamos que disfrute de los beneficios de ser un Cliente Fiel.
+            Municipio De Yumbo - Valle Del Cauca
+            
             <br>
             <br>
             <br>

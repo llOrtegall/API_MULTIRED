@@ -63,5 +63,29 @@ export async function sendEmail ({ userCreado }) {
 
   const info = await transporter.sendMail(mailOptions)
 
+  console.log(info)
   console.log(`Se envia correo a ${correo}`)
+}
+
+export async function resportEmail ({ data }) {
+  const { nombre, cedula, telefono } = data.client
+  const { motivo } = data
+
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS
+    }
+  })
+
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: 'Aplicaciones@grupomultired.com.co',
+    subject: 'Solicitud Elimación Registro Chat Boot',
+    html: htmlSend({ nombre, cedula, telefono, motivo })
+  }
+
+  const info = await transporter.sendMail(mailOptions)
+  console.log(info)
 }
