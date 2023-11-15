@@ -88,16 +88,16 @@ export const changePassword = async (req, res) => {
 
     // Validate the new password
     if (newPassword !== confirmPassword) {
-      throw new Error('Las nuevas contraseñas no coinciden')
+      throw new Error('La nueva contraseña no coinciden')
     }
 
     // Hash the new password
     const hashedPassword = await bcrypt.hash(newPassword, BCRYPT_SALT_ROUNDS)
 
     // Update the password in the database
-    await connectMysql.query('UPDATE login_chat_v1 SET password = ? WHERE username = ?', [hashedPassword, username])
+    await connectMysql.query('UPDATE login_chat SET password = ? WHERE username = ?', [hashedPassword, username])
 
-    res.status(200).json({ message: 'Contraseña actualizada correctamente' })
+    res.status(200).json({ message: 'Contraseña Actualizada Correctamente' })
   } catch (error) {
     res.status(400).json({ error: error.message })
   }

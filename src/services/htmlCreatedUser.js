@@ -1,73 +1,76 @@
-export function htmlCreatedUser ({ nombre, cedula, telefono, motivo }) {
+export function htmlCreatedUser ({ nombre, cedula, telefono }) {
   return (
     `
     <!DOCTYPE html>
-    <html>
+    <html lang="en">
+    
     <head>
-      <style>
-        body {
-          font-family: Arial, sans-serif;
-        }
-    
-        .spa1{
-          font-size: 18px;
-          color: #000;
-          text-align: center;
-          font-weight: bold;
-        }
-    
-        .container {
-          width: 70%;
-          margin: auto;
-          padding: 20px;
-          border: 2px solid #ddd;
-          border-radius: 5px;
-        }
-        h1 {
-          color: #444;
-        }
-        p {
-          color: #666;
-        }
-        .pmain {
-          font-size: 18px;
-          color: #000;
-          text-align: justify;
-        }
-        .pnombres{
-          font-size: 16px;
-          color: #000;
-          text-align: left;
-        }
-        .span1{
-          font-size: 18px;
-          font-weight: bold;
-          color: #000;
-        }
-      </style>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
     </head>
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 20px 40px;
+        }
+    
+        h1 {
+            text-align: center;
+        }
+    
+        .art1 {
+            display: flex;
+            justify-content: space-around;
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+    
+        .art2 {
+            padding-top: 20px;
+            font-size: 1.1rem;
+            text-align: justify;
+        }
+    
+        .art3 {
+            margin-top: 20px;
+            font-size: 1.1rem;
+        }
+    
+        span {
+            font-weight: bold;
+        }
+    </style>
+    
     <body>
-      <div class="container">
-        <h2>Confirmación de Registro Cliente Fiel</h1>
+        <h1>Información De Usuario Creada</h1>
     
-          <h3>Información De Usuario Recibida:</h3>
-          <p class="pnombres"><strong>Nombre:</strong> ${nombre} | <strong>Cedula:</strong> ${cedula} | <strong>Telefono:</strong> *****${telefono}</p>
+        <article class="art1">
+            <p>Nombre ${nombre}</p>
+            <p>Cedula *****${cedula}</p>
+            <p>Telefono ***${telefono}</p>
+        </article>
     
-          <p class="pmain">
-            Motivo Eliminación(a) <span class="span1">${motivo}</span>,
-          
-            Municipio De Yumbo - Valle Del Cauca
-            
+        <article class="art2">
+            <p class="p-1"><span>Estimado (a) ${nombre},</span></p>
+            Es un honor dirigirnos a usted <span> ${nombre}</span>
+            Hemos tenido el privilegio de trabajar he informarle que su solicitud para crear una cuenta de Cliente Fiel con
+            <span> Grupo Empresarial Multired (Gane Yumbo)</span> ha sido exitosa.
+            Ahora podras acumular puntos cada vez que compre formularios de Azar (Chance). Seria autorizado en nuestros
+            puntos de veta del Municipio de Yumbo.
+        </article>
+    
+        <article class="art3">
+            <span>Atentamente,</span>
             <br>
             <br>
-            <br>
-            Atentamente: <br> <br>
-            <span class="spa1">Grupo Empresarial Multired SA</span>
-          </p>
+            Grupo Empresarial Multired SA
+            Generado Automaticamente. <span>No responder este correo.</span>
+        </article>
     
-          <p>Generado automaticamente, No responder este correo.</p>
-      </div>
     </body>
+    
     </html>
     `
   )

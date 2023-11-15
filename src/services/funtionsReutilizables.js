@@ -45,6 +45,7 @@ export function obtenerFechaActual () {
 }
 
 export async function sendEmail ({ userCreado }) {
+  console.log(userCreado)
   const { nombre, cedula, telefono, correo } = userCreado
 
   const transporter = nodemailer.createTransport({
