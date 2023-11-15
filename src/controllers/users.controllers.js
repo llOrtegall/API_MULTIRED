@@ -43,7 +43,7 @@ export const getLogin = async (req, res) => {
 
 export const createUser = async (req, res) => {
   try {
-    const { nombre, apellidos, documento, telefono, correo } = req.body
+    const { nombres, apellidos, documento, telefono, correo, proceso } = req.body
     const [result] = await connectMysql.query('SELECT * FROM login_chat_v1 WHERE documento = ?', [documento])
     if (result.length > 0) {
       res.status(200).json({ message: 'Usuario Ya Se Encuentra Registrado' })
@@ -52,10 +52,9 @@ export const createUser = async (req, res) => {
     const username = `CP${documento}`
     const password = `CP${documento.slice(-3)}`
     const hashedPassword = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS)
-    const proceso = 0
     const [UserCreado] = await connectMysql.query(
-      'INSERT INTO login_chat_v1 (id, nombre, apellidos, documento, telefono, correo, username, password, estado, proceso) VALUES (UUID_TO_BIN(UUID()), ?, ?, ?, ?, ?, ?, ?, 1, ?)',
-      [nombre, apellidos, documento, telefono, correo, username, hashedPassword, proceso]
+      `INSERT INTO login_chat_v1 (nombres, apellidos, documento, telefono, correo, username, password, estado, empresa, proceso, rol) 
+        VALUES ('${nombres}', '${apellidos}', ${documento}, ${telefono}, '${correo}', '${username}', '${hashedPassword}', TRUE, 1, ${proceso}, 'ninguno');`
     )
     if (UserCreado.affectedRows === 1) {
       res.status(201).json({ message: 'Usuario Registrado Correctamente' })
@@ -64,6 +63,7 @@ export const createUser = async (req, res) => {
     }
   } catch (error) {
     res.status(409).json({ error: error.message })
+    console.log(error)
   }
 }
 
