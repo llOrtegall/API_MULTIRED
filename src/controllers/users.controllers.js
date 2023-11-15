@@ -35,7 +35,7 @@ export const getLogin = async (req, res) => {
       throw new Error('Contraseña Incorrecta')
     }
     const token = jwt.sign({ id, username, nombre, apellidos, correo, proceso }, JWT_SECRET)
-    res.cookie('token', token, { sameSite: 'none', secure: 'true' }).status(200).json({ id, username, nombre, apellidos, correo, proceso })
+    res.cookie('token', token, { sameSite: 'none', secure: 'true' }).status(200).json({ id, username, nombre, apellidos, correo, proceso, token })
   } catch (error) {
     res.status(401).json({ error: error.message })
   }
