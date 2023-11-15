@@ -35,7 +35,6 @@ export const createdClientFiel = async (req, res) => {
       const userCreado = { nombre, cedula, telefono, correo }
       sendEmail({ userCreado }) // Envío De Correo Al Cliente
       res.status(201).json({ success: true, message: 'Commit successfully committed', user: 'Usuario Creado' })
-	console.log(`Se ha creado un Cliente Fiel: ${nombre1} ${apellido1} ${cedula}`)
     } else {
       res.status(500).json({ success: false, message: 'Commit failed committed', user: 'Usuario No Creado' })
     }

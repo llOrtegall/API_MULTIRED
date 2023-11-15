@@ -66,3 +66,38 @@ export const createUser = async (req, res) => {
     res.status(409).json({ error: error.message })
   }
 }
+
+export const changePassword = async (req, res) => {
+  try {
+    const { username, oldPassword, newPassword, confirmPassword } = req.body
+
+    // Fetch the user
+    const [users] = await connectMysql.query('SELECT * FROM login_chat_v1 WHERE username = ?', [username])
+    if (users.length === 0) {
+      throw new Error('User not found')
+    }
+
+    const user = users[0]
+
+    // Check the old password
+    const passwordMatches = await bcrypt.compare(oldPassword, user.password)
+    if (!passwordMatches) {
+      throw new Error('Old password is incorrect')
+    }
+
+    // Validate the new password
+    if (newPassword !== confirmPassword) {
+      throw new Error('New passwords do not match')
+    }
+
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(newPassword, BCRYPT_SALT_ROUNDS)
+
+    // Update the password in the database
+    await connectMysql.query('UPDATE login_chat_v1 SET password = ? WHERE username = ?', [hashedPassword, username])
+
+    res.status(200).json({ message: 'Password updated successfully' })
+  } catch (error) {
+    res.status(400).json({ error: error.message })
+  }
+}
