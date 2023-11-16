@@ -21,3 +21,11 @@ export const connectOraDb = await oracledb.getConnection({
   password: process.env.PASS_WORD, // contains the hr schema password
   connectString: process.env.CONECT_STRING
 })
+
+export const conecToLoginMysql = createPool({
+  host: process.env.MYSQLLOGIN,
+  user: process.env.USR,
+  password: process.env.PASS,
+  port: process.env.PORT,
+  database: process.env.DATABASE
+})
