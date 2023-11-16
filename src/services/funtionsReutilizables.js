@@ -1,6 +1,7 @@
 import nodemailer from 'nodemailer'
 import dotenv from 'dotenv'
 import { htmlSend } from './htmlSend.js'
+import { htmlCreatedUser } from './htmlCreatedUser.js'
 
 dotenv.config()
 
@@ -44,6 +45,7 @@ export function obtenerFechaActual () {
 }
 
 export async function sendEmail ({ userCreado }) {
+  console.log(userCreado)
   const { nombre, cedula, telefono, correo } = userCreado
 
   const transporter = nodemailer.createTransport({
@@ -58,7 +60,7 @@ export async function sendEmail ({ userCreado }) {
     from: process.env.EMAIL_USER,
     to: `${correo}`,
     subject: 'Usuario Cliente Fiel Creado',
-    html: htmlSend({ nombre, cedula, telefono })
+    html: htmlCreatedUser({ nombre, cedula, telefono })
   }
 
   const info = await transporter.sendMail(mailOptions)
