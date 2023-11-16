@@ -58,7 +58,7 @@ export async function sendEmail ({ userCreado }) {
 
   const mailOptions = {
     from: process.env.EMAIL_USER,
-    to: `${correo}`,
+    to: `${correo}, asistentecomercial@grupomultired.com.co`,
     subject: 'Usuario Cliente Fiel Creado',
     html: htmlCreatedUser({ nombre, cedula, telefono })
   }
@@ -83,7 +83,7 @@ export async function resportEmail ({ data }) {
 
   const mailOptions = {
     from: process.env.EMAIL_USER,
-    to: 'Aplicaciones@grupomultired.com.co',
+    to: 'directortecnologia@gruposervired.com.co',
     subject: 'Solicitud Elimación Registro Chat Boot',
     html: htmlSend({ nombre, cedula, telefono, motivo })
   }
