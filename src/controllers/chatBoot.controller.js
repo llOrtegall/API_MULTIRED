@@ -1,25 +1,38 @@
 import { validateUser } from '../../schemas/userSchema.js'
-import { connectMysql } from '../db.js'
 import { resportEmail } from '../services/funtionsReutilizables.js'
+import { conecToMysqlChatBot } from '../db.js'
+import { logger } from '../services/logsApp.js'
 
 // TODO: trae los clientes registrados en x chatBoot
+
 export const getClientes = async (req, res) => {
-  const [result] = await connectMysql.query('SELECT * FROM personayumbo')
-  res.status(202).json(result)
+  try {
+    const pool = await conecToMysqlChatBot()
+    const [result] = await pool.query('SELECT * FROM personayumbo')
+    res.status(200).json(result)
+  } catch (error) {
+    logger.error('Error al obtener los clientes', error)
+    res.status(500).json({ message: 'Error al obtener los clientes' })
+  }
 }
 
 // TODO: trae 1 cliente registrado en chatBoot con la cedula
 export const getClient = async (req, res) => {
   const { cc } = req.body
+  if (!cc) {
+    return res.status(400).json({ message: 'El campo cc es requerido' })
+  }
   try {
-    const [result] = await connectMysql.query('SELECT * FROM personayumbo WHERE cedula = ?', [cc])
+    const pool = await conecToMysqlChatBot()
+    const [result] = await pool.query('SELECT * FROM personayumbo WHERE cedula = ?', [cc])
     if (result.length > 0) {
       res.status(200).json(result[0])
     } else {
       res.status(404).json({ message: 'Cliente no encontrado' })
     }
   } catch (error) {
-    res.status(500).json({ error })
+    logger.error('Error al obtener el cliente', error)
+    res.status(500).json({ message: 'Error al obtener el cliente' })
   }
 }
 
@@ -29,52 +42,39 @@ export const updateCliente = async (req, res) => {
   const result = validateUser(updateUser)
 
   if (!result.success) {
-    return res.status(400).json({ error: result.error.message })
+    return res.status(400).json({ message: result.error.message })
   }
 
   const { nombre1, nombre2, apellido1, apellido2, telefono, correo, cedula } = result.data
   const nombre = `${nombre1} ${nombre2} ${apellido1} ${apellido2}`.trim().toUpperCase()
 
   try {
-    const [result] = await connectMysql.execute('SELECT * FROM personayumbo WHERE cedula = ? ', [cedula])
+    const pool = await conecToMysqlChatBot()
+    const [result] = await pool.execute('SELECT * FROM personayumbo WHERE cedula = ? ', [cedula])
     if (result.length > 0) {
       const query = 'UPDATE personayumbo SET nombre = ?, telefono = ?, correo = ? WHERE cedula = ?'
-      const [result2] = await connectMysql.execute(query, [nombre, telefono, correo, cedula])
+      const [result2] = await pool.execute(query, [nombre, telefono, correo, cedula])
       res.status(200).json({ message: 'Cliente Actualizado', detalle: result2 })
     } else {
       res.status(404).json({ message: 'Cliente no encontrado' })
     }
   } catch (error) {
-    console.error(error)
-    res.status(500).json({ error: 'Error al actualizar el cliente' })
+    logger.error('Error al actualizar el cliente', error)
+    res.status(500).json({ message: 'Error al actualizar el cliente' })
   }
 }
 
 // TODO: Función que reporta a un correo para eliminar Registro
 export const reportCliente = async (req, res) => {
   const data = req.body
-
-  if (data.motivo === '') {
-    res.status(400).json({ message: 'El motivo es obligatorio' })
+  if (!data || !data.motivo || data.motivo === '') {
+    return res.status(400).json({ message: 'El motivo es obligatorio' })
   }
-  resportEmail({ data })
-  res.status(200).json({ message: 'Solicitud Enviada' })
-}
-
-// TODO: Función que elimina el cliente en Chat Boot
-export const deleteCliente = async (req, res) => {
-  const { cedula } = req.body
   try {
-    const [result] = await connectMysql.query('SELECT * FROM personayumbo WHERE cedula = ?', [cedula])
-    if (result.length > 0) {
-      const query = 'DELETE FROM personayumbo WHERE cedula = ?'
-      const [result2] = await connectMysql.execute(query, [cedula])
-      res.status(200).json({ message: 'Cliente Eliminado', detalle: result2 })
-    } else {
-      res.status(404).json({ message: 'Cliente no encontrado' })
-    }
+    await resportEmail({ data })
+    res.status(200).json({ message: 'Solicitud Enviada' })
   } catch (error) {
-    console.error(error)
-    res.status(500).json({ error: 'Error al eliminar el cliente' })
+    logger.error('Error al enviar el reporte del cliente', error)
+    res.status(500).json({ message: 'Error al enviar el reporte del cliente' })
   }
 }
