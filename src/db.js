@@ -17,17 +17,17 @@ export const connectMysql = createPool({
 
 // Creando el pool de conexiones a bd Clientes
 export const createPool2 = async () => {
-  let pool;
   try {
-    pool = await oracledb.createPool({
+    const pool = await oracledb.createPool({
       user: process.env.USER_NAME,
       password: process.env.PASS_WORD,
       connectString: process.env.CONECT_STRING
-    });
+    })
+    return pool
   } catch (error) {
-    console.error('Error al crear el pool de conexiones:', error);
+    console.error('Error al crear el pool de conexiones:', error)
+    throw error
   }
-  return pool;
 }
 
 export const conecToLoginMysql = createPool({
