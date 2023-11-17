@@ -15,12 +15,20 @@ export const connectMysql = createPool({
   database: process.env.NAME_DATABASE
 })
 
-// TODO: Creando la conecxión a bd Clientes
-export const connectOraDb = await oracledb.getConnection({
-  user: process.env.USER_NAME,
-  password: process.env.PASS_WORD, // contains the hr schema password
-  connectString: process.env.CONECT_STRING
-})
+// Creando el pool de conexiones a bd Clientes
+export const createPool2 = async () => {
+  let pool;
+  try {
+    pool = await oracledb.createPool({
+      user: process.env.USER_NAME,
+      password: process.env.PASS_WORD,
+      connectString: process.env.CONECT_STRING
+    });
+  } catch (error) {
+    console.error('Error al crear el pool de conexiones:', error);
+  }
+  return pool;
+}
 
 export const conecToLoginMysql = createPool({
   host: process.env.MYSQLLOGIN,

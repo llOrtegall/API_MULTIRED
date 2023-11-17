@@ -1,11 +1,14 @@
 import { obtenerFechaActual, sendEmail, separarNombre } from '../services/funtionsReutilizables.js'
 import { validateClientUser } from '../../schemas/userSchema.js'
-import { connectOraDb } from '../db.js'
+import { createPool2 } from '../db.js'
 
 export const getClientFiel = async (req, res) => {
   const { cc } = req.body
+  let connection;
   try {
-    const result = await connectOraDb.execute('SELECT * FROM gamble.clientes WHERE documento = :cc', { cc })
+    const pool = await createPool2();
+    connection = await pool.getConnection();
+    const result = await connection.execute('SELECT * FROM gamble.clientes WHERE documento = :cc', { cc })
     if (result.rows.length === 1) {
       res.status(200).json({ user: `${cc}`, Estado: 'Si Existe' })
     } else {
@@ -14,6 +17,14 @@ export const getClientFiel = async (req, res) => {
   } catch (error) {
     console.error(error)
     res.status(500).json({ error: 'Error al obtener el cliente' })
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (err) {
+        console.error(err);
+      }
+    }
   }
 }
 
@@ -30,11 +41,13 @@ export const createdClientFiel = async (req, res) => {
   }
 
   try {
-    const result = await connectOraDb.execute(`Insert into GAMBLE.CLIENTES (DOCUMENTO,TOTALPUNTOS,USUARIO,FECHASYS,NOMBRES,APELLIDO1,APELLIDO2,FECHANACIMIENTO,TELEFONO,DIRECCION,TIPO_DEPTO,CODDEPTO,TIPO_MUNICIPIO,CODMUNICIPIO,ENT_SEXO,DAT_DTO_SEXO,DOCALTERNO,NRO_FAVORITO,
+    const pool = await createPool2();
+    const connection = await pool.getConnection();
+    const result = await connection.execute(`Insert into GAMBLE.CLIENTES (DOCUMENTO,TOTALPUNTOS,USUARIO,FECHASYS,NOMBRES,APELLIDO1,APELLIDO2,FECHANACIMIENTO,TELEFONO,DIRECCION,TIPO_DEPTO,CODDEPTO,TIPO_MUNICIPIO,CODMUNICIPIO,ENT_SEXO,DAT_DTO_SEXO,DOCALTERNO,NRO_FAVORITO,
       VERSION,CCOSTO,MAIL,NOMBRE1,NOMBRE2,CELULAR,ACEPTAPOLITICATDP,CLIENTEVENDEDOR,CLAVECANAL,TPOTRT_CODIGO_NACION,TRT_CODIGO_NACION,TPOTRT_CODIGO_EXPDOC,TRT_CODIGO_EXPDOC,FECHAEXPDOC,DTO_CODIGO_TPDOC,ENT_CODIGO_TPDOC,IDLOGIN,SECURITY_TOKEN) 
       values ('${cedula}','u+#ajÕ','CP1118307852',to_date('${dia}/${mes}/${ano}','DD/MM/RR'),'${nombre1} ${nombre2}','${apellido1}','${apellido2}',to_date('01/01/97','DD/MM/RR'),'6696901','Cra 4 # 4-51','6','30','8','965','60','${sexoCliente}','${cedula}','','0','0','${correo}', '${nombre1}', '${nombre2}', '${telefono}','S', 'N','CHATBOOT', '2', '1','8','76892', to_date('01/01/15','DD/MM/RR'), '35', '70', null,null)`)
 
-    await connectOraDb.commit()
+    await connection.commit()
 
     if (result.rowsAffected === 1) {
       const userCreado = { nombre, cedula, telefono, correo }
@@ -45,5 +58,6 @@ export const createdClientFiel = async (req, res) => {
     }
   } catch (error) {
     res.status(500).json({ success: false, message: 'Commit error committed', detail: 'Celular Ya Existe ... Verificar Número, Edite Usuario' })
+    console.log(error)
   }
 }
