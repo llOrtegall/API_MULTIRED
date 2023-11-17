@@ -1,19 +1,36 @@
 import { createPool } from 'mysql2/promise'
-import env from 'dotenv'
+import { logger } from './services/logsApp.js'
 import oracledb from 'oracledb'
+import env from 'dotenv'
 
 env.config()
 
 oracledb.initOracleClient({ libDir: process.env.ORACLE_ROUTE })
 
-// TODO: Creando la conecxión Mysql
-export const connectMysql = createPool({
-  host: process.env.HOSTMYSQL,
-  user: process.env.USUARIO,
-  password: process.env.PASSWORD,
-  port: process.env.PUERTO,
-  database: process.env.NAME_DATABASE
-})
+const requiredEnvVars = ['HOSTMYSQL', 'USUARIO', 'PASSWORD', 'PUERTO', 'NAME_DATABASE', 'USER_NAME', 'PASS_WORD', 'CONECT_STRING']
+for (const varName of requiredEnvVars) {
+  if (!process.env[varName]) {
+    logger.error(`La variable de entorno ${varName} no está definida`)
+    process.exit(1)
+  }
+}
+
+// Creando la conexión Mysql
+export const conecToMysqlChatBot = async () => {
+  try {
+    const pool = await createPool({
+      host: process.env.HOSTMYSQL,
+      user: process.env.USUARIO,
+      password: process.env.PASSWORD,
+      port: process.env.PUERTO,
+      database: process.env.NAME_DATABASE
+    })
+    return pool
+  } catch (error) {
+    logger.error('Error al establecer la conexión con MySQL', error)
+    throw error
+  }
+}
 
 // Creando el pool de conexiones a bd Clientes
 export const createPool2 = async () => {
@@ -25,7 +42,7 @@ export const createPool2 = async () => {
     })
     return pool
   } catch (error) {
-    console.error('Error al crear el pool de conexiones:', error)
+    logger.error('Error al establecer la conexión con OracleDb', error)
     throw error
   }
 }

@@ -83,7 +83,7 @@ export async function resportEmail ({ data }) {
 
   const mailOptions = {
     from: process.env.EMAIL_USER,
-    to: 'directortecnologia@gruposervired.com.co',
+    to: process.env.EMAIL_SEND_REPORTS,
     subject: 'Solicitud Elimación Registro Chat Boot',
     html: htmlSend({ nombre, cedula, telefono, motivo })
   }
