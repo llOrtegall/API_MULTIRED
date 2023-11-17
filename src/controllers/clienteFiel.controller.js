@@ -7,23 +7,27 @@ export const getClientFiel = async (req, res) => {
   const { cc } = req.body
   let connection
   try {
+    if (!cc) {
+      return res.status(400).json({ message: 'El campo cc es requerido' })
+    }
     const pool = await createPool2()
     connection = await pool.getConnection()
     const { rows } = await connection.execute('SELECT * FROM gamble.clientes WHERE documento = :cc', { cc })
+
     if (rows.length === 1) {
       res.status(200).json({ user: `${cc}`, Estado: 'Si Existe' })
     } else {
       res.status(404).json({ user: `${cc}`, Estado: 'No Existe' })
     }
   } catch (error) {
-    console.error('Error al ejecutar la consulta:', error)
-    res.status(500).json({ error: 'Error al obtener el cliente' })
+    logger.error('Error al ejecutar la consulta', error)
+    res.status(500).json({ message: 'Error al obtener el cliente' })
   } finally {
     if (connection) {
       try {
         await connection.close()
       } catch (err) {
-        console.error('Error al cerrar la conexión:', err)
+        logger.error('Error al cerrar la conexión:', err)
       }
     }
   }
@@ -41,10 +45,10 @@ export const createdClientFiel = async (req, res) => {
     return res.status(400).json({ error: result.error.message })
   }
 
-  const pool = await createPool2()
-  const connection = await pool.getConnection()
-
+  let connection
   try {
+    const pool = await createPool2()
+    connection = await pool.getConnection()
     const result = await connection.execute(
       `Insert into GAMBLE.CLIENTES (DOCUMENTO,TOTALPUNTOS,USUARIO,FECHASYS,NOMBRES,APELLIDO1,APELLIDO2,FECHANACIMIENTO,TELEFONO,DIRECCION,TIPO_DEPTO,CODDEPTO,TIPO_MUNICIPIO,CODMUNICIPIO,ENT_SEXO,DAT_DTO_SEXO,DOCALTERNO,NRO_FAVORITO,
         VERSION,CCOSTO,MAIL,NOMBRE1,NOMBRE2,CELULAR,ACEPTAPOLITICATDP,CLIENTEVENDEDOR,CLAVECANAL,TPOTRT_CODIGO_NACION,TRT_CODIGO_NACION,TPOTRT_CODIGO_EXPDOC,TRT_CODIGO_EXPDOC,FECHAEXPDOC,DTO_CODIGO_TPDOC,ENT_CODIGO_TPDOC,IDLOGIN,SECURITY_TOKEN) 
@@ -60,6 +64,7 @@ export const createdClientFiel = async (req, res) => {
       res.status(201).json({ success: true, message: 'Usuario creado exitosamente' })
     }
   } catch (error) {
+    await connection.rollback() // Deshacer los cambios en caso de error
     if (error.code === 'ORA-00001') {
       logger.error('descripción del error: ', error)
       return res.status(409)
