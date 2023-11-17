@@ -2,3 +2,5 @@ node_modules
 .vscode-root
 .env
 iniciarapi.sh
+combined.log
+error.log
