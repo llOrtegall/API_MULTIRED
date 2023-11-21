@@ -4,7 +4,6 @@ import { createPool2 } from '../db.js'
 import { logger } from '../services/logsApp.js'
 
 export const getClientFiel = async (req, res) => {
-  console.log(req.body)
   const { ccs } = req.body
   let connection
   try {
