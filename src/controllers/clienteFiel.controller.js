@@ -12,6 +12,10 @@ export const getClientFiel = async (req, res) => {
     }
 
     const pool = await createPool2()
+    if (pool === null) {
+      return res.status(500).json({ message: 'Error al establecer la conexión con la base de datos' })
+    }
+
     connection = await pool.getConnection()
 
     const results = []
