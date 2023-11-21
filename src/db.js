@@ -18,7 +18,7 @@ for (const varName of requiredEnvVars) {
 // Creando la conexión Mysql
 export const conecToMysqlChatBot = async () => {
   try {
-    const pool = await createPool({
+    const pool = createPool({
       host: process.env.HOSTMYSQL,
       user: process.env.USUARIO,
       password: process.env.PASSWORD,
@@ -43,14 +43,21 @@ export const createPool2 = async () => {
     return pool
   } catch (error) {
     logger.error('Error al establecer la conexión con OracleDb', error)
+    return null
+  }
+}
+export const conecToLoginMysql = async () => {
+  try {
+    const pool = await createPool({
+      host: process.env.MYSQLLOGIN,
+      user: process.env.USR,
+      password: process.env.PASS,
+      port: process.env.PORT,
+      database: process.env.DATABASE
+    })
+    return pool
+  } catch (error) {
+    logger.error('Error al establecer la conexión con MySQL', error)
     throw error
   }
 }
-
-export const conecToLoginMysql = createPool({
-  host: process.env.MYSQLLOGIN,
-  user: process.env.USR,
-  password: process.env.PASS,
-  port: process.env.PORT,
-  database: process.env.DATABASE
-})
