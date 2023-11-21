@@ -4,24 +4,32 @@ import { createPool2 } from '../db.js'
 import { logger } from '../services/logsApp.js'
 
 export const getClientFiel = async (req, res) => {
-  const { cc } = req.body
+  console.log(req.body)
+  const { ccs } = req.body
   let connection
   try {
-    if (!cc) {
-      return res.status(400).json({ message: 'El campo cc es requerido' })
+    if (!ccs || !Array.isArray(ccs)) {
+      return res.status(400).json({ message: 'El campo ccs debe ser un array' })
     }
+
     const pool = await createPool2()
     connection = await pool.getConnection()
-    const { rows } = await connection.execute('SELECT * FROM gamble.clientes WHERE documento = :cc', { cc })
 
-    if (rows.length === 1) {
-      res.status(200).json({ user: `${cc}`, Estado: 'Si Existe' })
-    } else {
-      res.status(404).json({ user: `${cc}`, Estado: 'No Existe' })
+    const results = []
+    for (const cc of ccs) {
+      const { rows } = await connection.execute('SELECT documento FROM gamble.clientes WHERE documento = :cc', { cc })
+
+      if (rows.length === 1) {
+        results.push({ user: `${cc}`, Estado: 'Si Existe' })
+      } else {
+        results.push({ user: `${cc}`, Estado: 'No Existe' })
+      }
     }
+
+    res.status(200).json(results)
   } catch (error) {
     logger.error('Error al ejecutar la consulta', error)
-    res.status(500).json({ message: 'Error al obtener el cliente' })
+    res.status(500).json({ message: 'Error al obtener los clientes' })
   } finally {
     if (connection) {
       try {
