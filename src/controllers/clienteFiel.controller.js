@@ -44,6 +44,37 @@ export const getClientFiel = async (req, res) => {
   }
 }
 
+export const getClientFiel2 = async (req, res) => {
+  const { cc } = req.body
+  let connection
+  try {
+    const pool = await createPool2()
+    if (pool === null) {
+      return res.status(500).json({ message: 'Error al establecer la conexión con la base de datos' })
+    }
+
+    connection = await pool.getConnection()
+
+    const result = await connection.execute('SELECT documento FROM gamble.clientes WHERE documento = :cc', { cc })
+    if (result.rows.length === 1) {
+      res.status(200).json({ user: `${cc}`, Estado: 'Si Existe' })
+    } else {
+      res.status(200).json({ user: `${cc}`, Estado: 'No Existe' })
+    }
+  } catch (error) {
+    logger.error('Error al ejecutar la consulta', error)
+    res.status(500).json({ message: 'Error al obtener los clientes' })
+  } finally {
+    if (connection) {
+      try {
+        await connection.close()
+      } catch (err) {
+        logger.error('Error al cerrar la conexión:', err)
+      }
+    }
+  }
+}
+
 export const createdClientFiel = async (req, res) => {
   const { cedula, nombre, telefono, correo, sexo } = req.body
   const { dia, mes, ano } = obtenerFechaActual()
