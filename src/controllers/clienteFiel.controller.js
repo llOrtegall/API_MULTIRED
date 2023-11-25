@@ -23,9 +23,9 @@ export const getClientFiel = async (req, res) => {
       const { rows } = await connection.execute('SELECT documento FROM gamble.clientes WHERE documento = :cc', { cc })
 
       if (rows.length === 1) {
-        results.push({ user: `${cc}`, Estado: 'Si Existe' })
+        results.push({ Estado: 'Si Existe' })
       } else {
-        results.push({ user: `${cc}`, Estado: 'No Existe' })
+        results.push({ Estado: 'No Existe' })
       }
     }
 
@@ -52,14 +52,12 @@ export const getClientFiel2 = async (req, res) => {
     if (pool === null) {
       return res.status(500).json({ message: 'Error al establecer la conexión con la base de datos' })
     }
-
     connection = await pool.getConnection()
-
     const result = await connection.execute('SELECT documento FROM gamble.clientes WHERE documento = :cc', { cc })
     if (result.rows.length === 1) {
-      res.status(200).json({ user: `${cc}`, Estado: 'Si Existe' })
+      res.status(200).json({ Estado: 'Si Existe' })
     } else {
-      res.status(200).json({ user: `${cc}`, Estado: 'No Existe' })
+      res.status(200).json({ Estado: 'No Existe' })
     }
   } catch (error) {
     logger.error('Error al ejecutar la consulta', error)
