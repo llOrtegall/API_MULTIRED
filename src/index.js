@@ -11,11 +11,11 @@ dotenv.config()
 const app = express()
 const PORT = process.env.PUERTO_API || 4000
 
-app.disable('x-powered-by')
-app.use(corsMiddleware())
-
 app.use(cookieParser())
 app.use(express.json())
+
+app.disable('x-powered-by')
+app.use(corsMiddleware())
 
 // TODO: Metodos En Usuarios Login
 app.use(routerUser)

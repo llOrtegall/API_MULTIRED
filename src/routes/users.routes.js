@@ -5,7 +5,7 @@ export const routerUser = Router()
 
 routerUser.post('/login', getLogin)
 
-routerUser.get('/profile', getUser)
+routerUser.post('/profile', getUser)
 
 routerUser.post('/register', createUser)
 
