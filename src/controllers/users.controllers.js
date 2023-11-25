@@ -14,11 +14,11 @@ if (!JWT_SECRET) {
 
 export const getUser = async (req, res) => {
   try {
-    const token = req.cookies.token
+    const token = req.body.token
     if (!token) {
       throw new Error('No se proporcionó un token')
     }
-    const userData = jwt.verify(token, JWT_SECRET, { sameSite: 'none', secure: 'true' })
+    const userData = jwt.verify(token, JWT_SECRET)
     res.json(userData)
   } catch (error) {
     res.status(401).json({ message: error.message })
@@ -43,7 +43,7 @@ export const getLogin = async (req, res) => {
     }
 
     const token = jwt.sign({ id, username, nombres, apellidos, correo, proceso }, JWT_SECRET, { expiresIn: '1h' })
-    res.cookie('token', token, { sameSite: 'none', secure: 'true' }).status(200).json({ id, username, nombres, apellidos, correo, proceso })
+    res.cookie('token', token, { sameSite: 'none', secure: true }).status(200).json({ id, username, nombres, apellidos, correo, proceso, token })
   } catch (error) {
     res.status(401).json({ error: error.message })
   }
