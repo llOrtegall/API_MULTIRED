@@ -28,7 +28,7 @@ export const conecToMysqlChatBot = async () => {
     return pool
   } catch (error) {
     logger.error('Error al establecer la conexión con MySQL', error)
-    throw error
+    return null
   }
 }
 

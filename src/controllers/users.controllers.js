@@ -14,7 +14,7 @@ if (!JWT_SECRET) {
 
 export const getUser = async (req, res) => {
   try {
-    const token = req.headers.authorization?.split(' ')[1]
+    const token = req.cookies.token
     if (!token) {
       throw new Error('No se proporcionó un token')
     }
@@ -33,17 +33,17 @@ export const getLogin = async (req, res) => {
     }
     const [result] = await conecToLoginMysql.query('SELECT id, nombres, apellidos, correo, username, password, proceso FROM login_chat WHERE username = ?', [user])
     if (result.length === 0) {
-      throw new Error('El Usuario no existe ¡')
+      throw new Error('El Usuario No Existe ¡')
     }
     const userData = result[0]
     const { id, nombres, apellidos, correo, username, password: hashedPassword, proceso } = userData
     const passwordMatches = await bcrypt.compare(password, hashedPassword)
     if (!passwordMatches) {
-      throw new Error('Clave inválida verifiquela')
+      throw new Error('Clave Inválida Verifiquela ¡')
     }
 
     const token = jwt.sign({ id, username, nombres, apellidos, correo, proceso }, JWT_SECRET, { expiresIn: '1h' })
-    res.cookie('token', token, { sameSite: 'none', secure: 'true' }).status(200).json({ id, username, nombres, apellidos, correo, proceso, token })
+    res.cookie('token', token, { sameSite: 'none', secure: 'true' }).status(200).json({ id, username, nombres, apellidos, correo, proceso })
   } catch (error) {
     res.status(401).json({ error: error.message })
   }

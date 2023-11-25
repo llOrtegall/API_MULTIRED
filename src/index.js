@@ -17,11 +17,6 @@ app.use(corsMiddleware())
 app.use(cookieParser())
 app.use(express.json())
 
-// TODO: Test De Conexción
-app.get('/', (req, res) => {
-  res.send('API FUNCIONANDO CORRECTAMENTE')
-})
-
 // TODO: Metodos En Usuarios Login
 app.use(routerUser)
 
