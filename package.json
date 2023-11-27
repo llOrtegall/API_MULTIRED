@@ -9,7 +9,7 @@
     "dev": "nodemon ./src/index.js"
   },
   "keywords": [],
-  "author": "Ivan Ortega Garzon (llOrTeGall)",
+  "author": "Ivan Ortega Garzon (GitHub: llOrTeGall)",
   "license": "MIT",
   "dependencies": {
     "bcryptjs": "^2.4.3",

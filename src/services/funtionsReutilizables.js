@@ -64,7 +64,6 @@ export async function sendEmail ({ userCreado }) {
   }
 
   const info = await transporter.sendMail(mailOptions)
-
   console.log(info)
   console.log(`Se envia correo a ${correo}`)
 }

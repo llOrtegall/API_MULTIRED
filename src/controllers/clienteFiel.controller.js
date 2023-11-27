@@ -5,70 +5,27 @@ import { logger } from '../services/logsApp.js'
 
 export const getClientFiel = async (req, res) => {
   const { ccs } = req.body
-  let connection
-  try {
-    if (!ccs || !Array.isArray(ccs)) {
-      return res.status(400).json({ message: 'El campo ccs debe ser un array' })
-    }
+  const pool = await createPool2()
+  const connection = await pool.getConnection()
 
-    const pool = await createPool2()
+  try {
     if (pool === null) {
       return res.status(500).json({ message: 'Error al establecer la conexión con la base de datos' })
     }
-
-    connection = await pool.getConnection()
-
-    const results = []
-    for (const cc of ccs) {
-      const { rows } = await connection.execute('SELECT documento FROM gamble.clientes WHERE documento = :cc', { cc })
-
-      if (rows.length === 1) {
-        results.push({ Estado: 'Si Existe' })
-      } else {
-        results.push({ Estado: 'No Existe' })
-      }
-    }
-
+    const promises = ccs.map(cc =>
+      connection.execute('SELECT documento FROM gamble.clientes WHERE documento = :cc', { cc })
+        .then(({ rows }) => ({ Estado: rows.length === 1 ? 'Si Existe' : 'No Existe' }))
+    )
+    const results = await Promise.all(promises)
     res.status(200).json(results)
   } catch (error) {
     logger.error('Error al ejecutar la consulta', error)
     res.status(500).json({ message: 'Error al obtener los clientes' })
   } finally {
-    if (connection) {
-      try {
-        await connection.close()
-      } catch (err) {
-        logger.error('Error al cerrar la conexión:', err)
-      }
-    }
-  }
-}
-
-export const getClientFiel2 = async (req, res) => {
-  const { cc } = req.body
-  let connection
-  try {
-    const pool = await createPool2()
-    if (pool === null) {
-      return res.status(500).json({ message: 'Error al establecer la conexión con la base de datos' })
-    }
-    connection = await pool.getConnection()
-    const result = await connection.execute('SELECT documento FROM gamble.clientes WHERE documento = :cc', { cc })
-    if (result.rows.length === 1) {
-      res.status(200).json({ Estado: 'Si Existe' })
-    } else {
-      res.status(200).json({ Estado: 'No Existe' })
-    }
-  } catch (error) {
-    logger.error('Error al ejecutar la consulta', error)
-    res.status(500).json({ message: 'Error al obtener los clientes' })
-  } finally {
-    if (connection) {
-      try {
-        await connection.close()
-      } catch (err) {
-        logger.error('Error al cerrar la conexión:', err)
-      }
+    try {
+      await connection.close()
+    } catch (err) {
+      logger.error('Error al cerrar la conexión:', err)
     }
   }
 }
@@ -85,10 +42,10 @@ export const createdClientFiel = async (req, res) => {
     return res.status(400).json({ error: result.error.message })
   }
 
-  let connection
+  const pool = await createPool2()
+  const connection = await pool.getConnection()
+
   try {
-    const pool = await createPool2()
-    connection = await pool.getConnection()
     const result = await connection.execute(
       `Insert into GAMBLE.CLIENTES (DOCUMENTO,TOTALPUNTOS,USUARIO,FECHASYS,NOMBRES,APELLIDO1,APELLIDO2,FECHANACIMIENTO,TELEFONO,DIRECCION,TIPO_DEPTO,CODDEPTO,TIPO_MUNICIPIO,CODMUNICIPIO,ENT_SEXO,DAT_DTO_SEXO,DOCALTERNO,NRO_FAVORITO,
         VERSION,CCOSTO,MAIL,NOMBRE1,NOMBRE2,CELULAR,ACEPTAPOLITICATDP,CLIENTEVENDEDOR,CLAVECANAL,TPOTRT_CODIGO_NACION,TRT_CODIGO_NACION,TPOTRT_CODIGO_EXPDOC,TRT_CODIGO_EXPDOC,FECHAEXPDOC,DTO_CODIGO_TPDOC,ENT_CODIGO_TPDOC,IDLOGIN,SECURITY_TOKEN) 
@@ -113,12 +70,10 @@ export const createdClientFiel = async (req, res) => {
     logger.error('Ocurrió un error al crear el usuario: ', error)
     return res.status(500).json({ message: 'Ocurrió un error al crear el usuario, consulte con el admin' })
   } finally {
-    if (connection) {
-      try {
-        await connection.close()
-      } catch (err) {
-        logger.error('Error al cerrar la conexión:', err)
-      }
+    try {
+      await connection.close()
+    } catch (err) {
+      logger.error('Error al cerrar la conexión:', err)
     }
   }
 }
