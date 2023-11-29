@@ -13,13 +13,14 @@ if (!JWT_SECRET) {
 }
 
 export const getUser = async (req, res) => {
+  const token = req.body.token
+  if (!token) {
+    return res.status(401).json({ message: 'No se ha enviado el token' })
+  }
+
   try {
-    const token = req.body.token
-    if (!token) {
-      throw new Error('No se proporcionó un token')
-    }
     const userData = jwt.verify(token, JWT_SECRET)
-    res.json(userData)
+    res.status(200).json(userData)
   } catch (error) {
     res.status(401).json({ message: error.message })
   }
