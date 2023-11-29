@@ -6,13 +6,23 @@ import { logger } from '../services/logsApp.js'
 // TODO: trae los clientes registrados en x chatBoot
 
 export const getClientes = async (req, res) => {
+  const pool = await conecToMysqlChatBot()
+  const connection = await pool.getConnection()
   try {
-    const pool = await conecToMysqlChatBot()
-    const [result] = await pool.query('SELECT * FROM personayumbo')
+    if (pool === null) {
+      return res.status(500).json({ message: 'Error al establecer la conexión con la base de datos' })
+    }
+    const [result] = await connection.query('SELECT * FROM personayumbo')
     res.status(200).json(result)
   } catch (error) {
     logger.error('Error al obtener los clientes', error)
     res.status(500).json({ message: 'Error al obtener los clientes' })
+  } finally {
+    try {
+      await connection.close()
+    } catch (err) {
+      logger.error('Error al cerrar la conexión:', err)
+    }
   }
 }
 
@@ -22,9 +32,10 @@ export const getClient = async (req, res) => {
   if (!cc) {
     return res.status(400).json({ message: 'El campo cc es requerido' })
   }
+  const pool = await conecToMysqlChatBot()
+  const connection = await pool.getConnection()
   try {
-    const pool = await conecToMysqlChatBot()
-    const [result] = await pool.query('SELECT * FROM personayumbo WHERE cedula = ?', [cc])
+    const [result] = await connection.query('SELECT * FROM personayumbo WHERE cedula = ?', [cc])
     if (result.length > 0) {
       res.status(200).json(result[0])
     } else {
@@ -33,6 +44,12 @@ export const getClient = async (req, res) => {
   } catch (error) {
     logger.error('Error al obtener el cliente', error)
     res.status(500).json({ message: 'Error al obtener el cliente' })
+  } finally {
+    try {
+      await connection.close()
+    } catch (err) {
+      logger.error('Error al cerrar la conexión:', err)
+    }
   }
 }
 
