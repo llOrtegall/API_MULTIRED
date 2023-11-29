@@ -106,12 +106,19 @@ export const createUser = async (req, res) => {
 }
 
 export const changePassword = async (req, res) => {
+  const { username, oldPassword, newPassword, confirmPassword } = req.body
+  if (!username || !oldPassword || !newPassword || !confirmPassword) {
+    return res.status(400).json({ error: 'Todos los campos son requeridos' })
+  }
+
+  const pool = await conecToLoginMysql()
+  if (pool === null) {
+    return res.status(500).json({ message: 'Error al establecer la conexión con la base de datos' })
+  }
+  const connection = await pool.getConnection()
+
   try {
-    const { username, oldPassword, newPassword, confirmPassword } = req.body
-    if (!username || !oldPassword || !newPassword || !confirmPassword) {
-      return res.status(400).json({ error: 'Todos los campos son requeridos' })
-    }
-    const [users] = await conecToLoginMysql.query('SELECT * FROM login_chat WHERE username = ?', [username])
+    const [users] = await connection.query('SELECT * FROM login_chat WHERE username = ?', [username])
     if (users.length === 0) {
       return res.status(401).json({ error: 'Credenciales inválidas' })
     }
@@ -124,12 +131,18 @@ export const changePassword = async (req, res) => {
       return res.status(400).json({ error: 'La nueva contraseña no coinciden' })
     }
     const hashedPassword = await bcrypt.hash(newPassword, BCRYPT_SALT_ROUNDS)
-    const [updateResult] = await conecToLoginMysql.query('UPDATE login_chat SET password = ? WHERE username = ?', [hashedPassword, username])
+    const [updateResult] = await connection.query('UPDATE login_chat SET password = ? WHERE username = ?', [hashedPassword, username])
     if (updateResult.affectedRows === 0) {
       throw new Error('No se pudo actualizar la contraseña')
     }
     res.status(200).json({ message: 'Contraseña Actualizada Correctamente' })
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    res.status(500).json({ error })
+  } finally {
+    try {
+      await connection.close()
+    } catch (error) {
+      res.status(500).json({ error })
+    }
   }
 }
