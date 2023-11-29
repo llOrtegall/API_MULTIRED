@@ -47,10 +47,18 @@ export const createPool2 = async () => {
   }
 }
 
-export const conecToLoginMysql = createPool({
-  host: process.env.MYSQLLOGIN,
-  user: process.env.USR,
-  password: process.env.PASS,
-  port: process.env.PORT,
-  database: process.env.DATABASE
-})
+export const conecToLoginMysql = async () => {
+  try {
+    const pool = createPool({
+      host: process.env.MYSQLLOGIN,
+      user: process.env.USR,
+      password: process.env.PASS,
+      port: process.env.PORT,
+      database: process.env.DATABASE
+    })
+    return pool
+  } catch (error) {
+    logger.error('Error al establecer la conexión con MySQL', error)
+    return null
+  }
+}

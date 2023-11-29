@@ -26,12 +26,21 @@ export const getUser = async (req, res) => {
 }
 
 export const getLogin = async (req, res) => {
+  const { user, password } = req.body
+  // TODO: Primero valida que lleguen las credenciales
+  if (!user || !password) {
+    return res.status(400).json({ error: 'El usuario y la contraseña son requeridos' })
+  }
+  // TODO: crea la pool y verifica que este abierta la misma
+  const pool = await conecToLoginMysql()
+  if (pool === null) {
+    return res.status(500).json({ message: 'Error al establecer la conexión con la base de datos' })
+  }
+  // TODO: crea la conexión
+  const connection = await pool.getConnection()
+
   try {
-    const { user, password } = req.body
-    if (!user || !password) {
-      return res.status(400).json({ error: 'El usuario y la contraseña son requeridos' })
-    }
-    const [result] = await conecToLoginMysql.query('SELECT id, nombres, apellidos, correo, username, password, proceso FROM login_chat WHERE username = ?', [user])
+    const [result] = await connection.query('SELECT id, nombres, apellidos, correo, username, password, proceso FROM login_chat WHERE username = ?', [user])
     if (result.length === 0) {
       throw new Error('El Usuario No Existe ¡')
     }
@@ -45,25 +54,36 @@ export const getLogin = async (req, res) => {
     const token = jwt.sign({ id, username, nombres, apellidos, correo, proceso }, JWT_SECRET, { expiresIn: '1h' })
     res.cookie('token', token, { sameSite: 'none', secure: true }).status(200).json({ id, username, nombres, apellidos, correo, proceso, token })
   } catch (error) {
-    res.status(401).json({ error: error.message })
+    res.status(401).json({ error })
+  } finally {
+    try {
+      await connection.close()
+    } catch (error) {
+      res.status(500).json({ error })
+    }
   }
 }
 
 export const createUser = async (req, res) => {
-  try {
-    const { nombres, apellidos, documento, telefono, correo, proceso } = req.body
+  const { nombres, apellidos, documento, telefono, correo, proceso } = req.body
+  if (!nombres || !apellidos || !documento || !telefono || !correo || !proceso) {
+    return res.status(400).json({ error: 'Todos los campos son requeridos' })
+  }
+  const pool = await conecToLoginMysql()
+  if (pool === null) {
+    return res.status(500).json({ message: 'Error al establecer la conexión con la base de datos' })
+  }
+  const connection = await pool.getConnection()
 
-    if (!nombres || !apellidos || !documento || !telefono || !correo || !proceso) {
-      return res.status(400).json({ error: 'Todos los campos son requeridos' })
-    }
-    const [result] = await conecToLoginMysql.query('SELECT * FROM login_chat WHERE documento = ?', [documento])
+  try {
+    const [result] = await connection.query('SELECT * FROM login_chat WHERE documento = ?', [documento])
     if (result.length > 0) {
       return res.status(409).json({ message: 'Usuario Ya Se Encuentra Registrado' })
     }
     const username = `CP${documento}`
     const password = `CP${documento.slice(-3)}`
     const hashedPassword = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS)
-    const [UserCreado] = await conecToLoginMysql.query(
+    const [UserCreado] = await connection.query(
       `INSERT INTO login_chat (nombres, apellidos, documento, telefono, correo, username, password, estado, empresa, proceso, rol) 
         VALUES (?, ?, ?, ?, ?, ?, ?, TRUE, 1, ?, 'ninguno');`,
       [nombres, apellidos, documento, telefono, correo, username, hashedPassword, proceso]
@@ -76,16 +96,29 @@ export const createUser = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message })
     console.log(error)
+  } finally {
+    try {
+      await connection.close()
+    } catch (error) {
+      res.status(500).json({ error: error.message })
+    }
   }
 }
 
 export const changePassword = async (req, res) => {
+  const { username, oldPassword, newPassword, confirmPassword } = req.body
+  if (!username || !oldPassword || !newPassword || !confirmPassword) {
+    return res.status(400).json({ error: 'Todos los campos son requeridos' })
+  }
+
+  const pool = await conecToLoginMysql()
+  if (pool === null) {
+    return res.status(500).json({ message: 'Error al establecer la conexión con la base de datos' })
+  }
+  const connection = await pool.getConnection()
+
   try {
-    const { username, oldPassword, newPassword, confirmPassword } = req.body
-    if (!username || !oldPassword || !newPassword || !confirmPassword) {
-      return res.status(400).json({ error: 'Todos los campos son requeridos' })
-    }
-    const [users] = await conecToLoginMysql.query('SELECT * FROM login_chat WHERE username = ?', [username])
+    const [users] = await connection.query('SELECT * FROM login_chat WHERE username = ?', [username])
     if (users.length === 0) {
       return res.status(401).json({ error: 'Credenciales inválidas' })
     }
@@ -98,12 +131,18 @@ export const changePassword = async (req, res) => {
       return res.status(400).json({ error: 'La nueva contraseña no coinciden' })
     }
     const hashedPassword = await bcrypt.hash(newPassword, BCRYPT_SALT_ROUNDS)
-    const [updateResult] = await conecToLoginMysql.query('UPDATE login_chat SET password = ? WHERE username = ?', [hashedPassword, username])
+    const [updateResult] = await connection.query('UPDATE login_chat SET password = ? WHERE username = ?', [hashedPassword, username])
     if (updateResult.affectedRows === 0) {
       throw new Error('No se pudo actualizar la contraseña')
     }
     res.status(200).json({ message: 'Contraseña Actualizada Correctamente' })
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    res.status(500).json({ error })
+  } finally {
+    try {
+      await connection.close()
+    } catch (error) {
+      res.status(500).json({ error })
+    }
   }
 }
