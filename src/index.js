@@ -10,7 +10,8 @@ import cors from 'cors'
 dotenv.config()
 
 const ACCEPTED_ORIGINS = [
-  'http://172.20.1.160'
+  'http://172.20.1.160',
+  'http://localhost:5173'
 ]
 
 const app = express()
@@ -27,7 +28,6 @@ app.use(morgan('dev'))
 
 app.use(cookieParser())
 app.use(express.json())
-
 
 // TODO: Metodos En Usuarios Login
 app.use(routerUser)

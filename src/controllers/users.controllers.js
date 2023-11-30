@@ -39,13 +39,17 @@ export const getLogin = async (req, res) => {
   try {
     const [result] = await connection.query('SELECT id, nombres, apellidos, correo, username, password, proceso FROM login_chat WHERE username = ?', [user])
     if (result.length === 0) {
-      throw new Error('El Usuario No Existe ¡')
+      res.status(401).json({ error: 'El Usuario No Existe' })
+      return
     }
+
     const userData = result[0]
     const { id, nombres, apellidos, correo, username, password: hashedPassword, proceso } = userData
     const passwordMatches = await bcrypt.compare(password, hashedPassword)
+
     if (!passwordMatches) {
-      throw new Error('Clave Inválida Verifiquela ¡')
+      res.status(401).json({ error: 'Clave Invalida Retifiquela' })
+      return
     }
 
     const token = jwt.sign({ id, username, nombres, apellidos, correo, proceso }, JWT_SECRET, { expiresIn: '1h' })
