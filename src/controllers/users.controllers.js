@@ -1,4 +1,4 @@
-import { conecToLoginMysql } from '../db.js'
+import { conecToLoginMysql } from '../mysqlDB.js'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
 import dotenv from 'dotenv'
@@ -32,24 +32,24 @@ export const getLogin = async (req, res) => {
   if (!user || !password) {
     return res.status(400).json({ error: 'El usuario y la contraseña son requeridos' })
   }
-  // TODO: crea la pool y verifica que este abierta la misma
+
   const pool = await conecToLoginMysql()
-  if (pool === null) {
-    return res.status(500).json({ message: 'Error al establecer la conexión con la base de datos' })
-  }
-  // TODO: crea la conexión
   const connection = await pool.getConnection()
 
   try {
     const [result] = await connection.query('SELECT id, nombres, apellidos, correo, username, password, proceso FROM login_chat WHERE username = ?', [user])
     if (result.length === 0) {
-      throw new Error('El Usuario No Existe ¡')
+      res.status(401).json({ error: 'El Usuario No Existe' })
+      return
     }
+
     const userData = result[0]
     const { id, nombres, apellidos, correo, username, password: hashedPassword, proceso } = userData
     const passwordMatches = await bcrypt.compare(password, hashedPassword)
+
     if (!passwordMatches) {
-      throw new Error('Clave Inválida Verifiquela ¡')
+      res.status(401).json({ error: 'Clave Invalida Retifiquela' })
+      return
     }
 
     const token = jwt.sign({ id, username, nombres, apellidos, correo, proceso }, JWT_SECRET, { expiresIn: '1h' })
@@ -57,11 +57,8 @@ export const getLogin = async (req, res) => {
   } catch (error) {
     res.status(401).json({ error })
   } finally {
-    try {
-      await connection.close()
-    } catch (error) {
-      res.status(500).json({ error })
-    }
+    connection.destroy()
+    pool.end()
   }
 }
 
@@ -71,9 +68,6 @@ export const createUser = async (req, res) => {
     return res.status(400).json({ error: 'Todos los campos son requeridos' })
   }
   const pool = await conecToLoginMysql()
-  if (pool === null) {
-    return res.status(500).json({ message: 'Error al establecer la conexión con la base de datos' })
-  }
   const connection = await pool.getConnection()
 
   try {
@@ -98,11 +92,8 @@ export const createUser = async (req, res) => {
     res.status(500).json({ error: error.message })
     console.log(error)
   } finally {
-    try {
-      await connection.close()
-    } catch (error) {
-      res.status(500).json({ error: error.message })
-    }
+    connection.destroy()
+    pool.end()
   }
 }
 
@@ -113,9 +104,6 @@ export const changePassword = async (req, res) => {
   }
 
   const pool = await conecToLoginMysql()
-  if (pool === null) {
-    return res.status(500).json({ message: 'Error al establecer la conexión con la base de datos' })
-  }
   const connection = await pool.getConnection()
 
   try {
@@ -140,10 +128,7 @@ export const changePassword = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error })
   } finally {
-    try {
-      await connection.close()
-    } catch (error) {
-      res.status(500).json({ error })
-    }
+    connection.destroy()
+    pool.end()
   }
 }
