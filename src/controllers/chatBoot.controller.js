@@ -1,6 +1,6 @@
 import { validateUser } from '../../schemas/userSchema.js'
 import { resportEmail } from '../services/funtionsReutilizables.js'
-import { conecToMysqlChatBot } from '../db.js'
+import { conecToMysqlChatBot } from '../mysqlDB.js'
 import { logger } from '../services/logsApp.js'
 
 // TODO: trae los clientes registrados en x chatBoot
@@ -18,11 +18,8 @@ export const getClientes = async (req, res) => {
     logger.error('Error al obtener los clientes', error)
     res.status(500).json({ message: 'Error al obtener los clientes' })
   } finally {
-    try {
-      await connection.close()
-    } catch (err) {
-      logger.error('Error al cerrar la conexión:', err)
-    }
+    connection.destroy()
+    pool.end()
   }
 }
 
@@ -45,11 +42,8 @@ export const getClient = async (req, res) => {
     logger.error('Error al obtener el cliente', error)
     res.status(500).json({ message: 'Error al obtener el cliente' })
   } finally {
-    try {
-      await connection.close()
-    } catch (err) {
-      logger.error('Error al cerrar la conexión:', err)
-    }
+    connection.destroy()
+    pool.end()
   }
 }
 
@@ -65,12 +59,14 @@ export const updateCliente = async (req, res) => {
   const { nombre1, nombre2, apellido1, apellido2, telefono, correo, cedula } = result.data
   const nombre = `${nombre1} ${nombre2} ${apellido1} ${apellido2}`.trim().toUpperCase()
 
+  const pool = await conecToMysqlChatBot()
+  const connection = await pool.getConnection()
+
   try {
-    const pool = await conecToMysqlChatBot()
-    const [result] = await pool.execute('SELECT * FROM personayumbo WHERE cedula = ? ', [cedula])
+    const [result] = await connection.execute('SELECT * FROM personayumbo WHERE cedula = ? ', [cedula])
     if (result.length > 0) {
       const query = 'UPDATE personayumbo SET nombre = ?, telefono = ?, correo = ? WHERE cedula = ?'
-      const [result2] = await pool.execute(query, [nombre, telefono, correo, cedula])
+      const [result2] = await connection.execute(query, [nombre, telefono, correo, cedula])
       res.status(200).json({ message: 'Cliente Actualizado', detalle: result2 })
     } else {
       res.status(404).json({ message: 'Cliente no encontrado' })
@@ -78,6 +74,9 @@ export const updateCliente = async (req, res) => {
   } catch (error) {
     logger.error('Error al actualizar el cliente', error)
     res.status(500).json({ message: 'Error al actualizar el cliente' })
+  } finally {
+    connection.destroy()
+    pool.end()
   }
 }
 

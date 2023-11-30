@@ -1,17 +1,15 @@
 import { obtenerFechaActual, sendEmail, separarNombre } from '../services/funtionsReutilizables.js'
 import { validateClientUser } from '../../schemas/userSchema.js'
-import { createPool2 } from '../db.js'
+import { conectOraDB } from '../oracleDB.js'
 import { logger } from '../services/logsApp.js'
 
 export const getClientFiel = async (req, res) => {
   const { ccs } = req.body
-  const pool = await createPool2()
+
+  const pool = await conectOraDB()
   const connection = await pool.getConnection()
 
   try {
-    if (pool === null) {
-      return res.status(500).json({ message: 'Error al establecer la conexión con la base de datos' })
-    }
     const promises = ccs.map(cc =>
       connection.execute('SELECT documento FROM gamble.clientes WHERE documento = :cc', { cc })
         .then(({ rows }) => ({ Estado: rows.length === 1 ? 'Si Existe' : 'No Existe' }))
@@ -22,11 +20,8 @@ export const getClientFiel = async (req, res) => {
     logger.error('Error al ejecutar la consulta', error)
     res.status(500).json({ message: 'Error al obtener los clientes' })
   } finally {
-    try {
-      await connection.close()
-    } catch (err) {
-      logger.error('Error al cerrar la conexión:', err)
-    }
+    await connection.close()
+    await pool.close()
   }
 }
 
@@ -42,7 +37,7 @@ export const createdClientFiel = async (req, res) => {
     return res.status(400).json({ error: result.error.message })
   }
 
-  const pool = await createPool2()
+  const pool = await conectOraDB()
   const connection = await pool.getConnection()
 
   try {
@@ -62,18 +57,10 @@ export const createdClientFiel = async (req, res) => {
     }
   } catch (error) {
     await connection.rollback() // Deshacer los cambios en caso de error
-    if (error.code === 'ORA-00001') {
-      logger.error('descripción del error: ', error)
-      return res.status(409)
-        .json({ message: 'User o Celular ya están registrados Validar la información' })
-    }
     logger.error('Ocurrió un error al crear el usuario: ', error)
     return res.status(500).json({ message: 'Ocurrió un error al crear el usuario, consulte con el admin' })
   } finally {
-    try {
-      await connection.close()
-    } catch (err) {
-      logger.error('Error al cerrar la conexión:', err)
-    }
+    await connection.close()
+    await pool.close()
   }
 }
