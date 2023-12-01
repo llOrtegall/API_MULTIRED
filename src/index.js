@@ -1,6 +1,6 @@
-import { chatBootClient } from './routes/chatBoot.routes.js'
-import { routerCF } from './routes/clienteFiel.routes.js'
-import { routerUser } from './routes/users.routes.js'
+import { ChatBoot } from './routes/chatBoot.routes.js'
+import { ClienteFiel } from './routes/clienteFiel.routes.js'
+import { LoginUser } from './routes/users.routes.js'
 import cookieParser from 'cookie-parser'
 import morgan from 'morgan'
 import express from 'express'
@@ -30,13 +30,13 @@ app.use(cookieParser())
 app.use(express.json())
 
 // TODO: Metodos En Usuarios Login
-app.use(routerUser)
+app.use(LoginUser)
 
 // TODO: Metodos Cliente Fiel
-app.use(routerCF)
+app.use(ClienteFiel)
 
 // TODO: Metodos En Chat Boot DB
-app.use(chatBootClient)
+app.use(ChatBoot)
 
 app.listen(PORT, () => {
   console.log(`Server Iniciado En El Puerto http://localhost:${PORT}`)
