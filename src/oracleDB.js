@@ -1,7 +1,7 @@
 import oracledb from 'oracledb'
-import dotenv from 'dotenv'
+import env from 'dotenv'
 
-dotenv.config()
+env.config()
 
 oracledb.initOracleClient({ libDir: process.env.ORACLE_ROUTE })
 

@@ -10,7 +10,7 @@ export const conecToMysqlChatBot = async () => {
     user: process.env.USUARIO,
     password: process.env.PASSWORD,
     port: process.env.PUERTO,
-    database: process.env.NAME_DATABASE,
+    database: process.env.NAME_DATABASE
   })
   return pool
 }
