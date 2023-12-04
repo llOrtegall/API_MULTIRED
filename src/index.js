@@ -2,9 +2,9 @@ import { ChatBoot } from './routes/chatBoot.routes.js'
 import { ClienteFiel } from './routes/clienteFiel.routes.js'
 import { LoginUser } from './routes/users.routes.js'
 import cookieParser from 'cookie-parser'
-import morgan from 'morgan'
 import express from 'express'
 import dotenv from 'dotenv'
+import morgan from 'morgan'
 import cors from 'cors'
 
 dotenv.config()
