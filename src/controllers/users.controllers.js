@@ -42,7 +42,6 @@ export const getLogin = async (req, res) => {
       res.status(401).json({ error: 'El Usuario No Existe' })
       return
     }
-
     const userData = result[0]
     const { id, nombres, apellidos, correo, username, password: hashedPassword, proceso } = userData
     const passwordMatches = await bcrypt.compare(password, hashedPassword)

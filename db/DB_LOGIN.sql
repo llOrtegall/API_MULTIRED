@@ -12,10 +12,13 @@ CREATE TABLE login_chat (
   password2 VARCHAR(80) DEFAULT NULL,
   estado BOOLEAN DEFAULT TRUE NOT NULL,
   empresa INT DEFAULT 0 CHECK (empresa BETWEEN 0 AND 2), # 0 AMBAS 1 - SERVIRES 2 - MULITRED 
-  proceso INT DEFAULT 0 CHECK (proceso BETWEEN 0 AND 9),
+  proceso INT DEFAULT 0 CHECK (proceso BETWEEN 0 AND 9), # 1 -->Técnología 2 -->Contabilidad 3--> Comercial 4--> Administración 
+  # 5--> Gestión Humana 6--> Gerencia 7--> Tesoreria 8--> Auditoria 9--> Cumplimiento 
   rol VARCHAR(30),
   fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+
 
 # Descripción de la tabla login_chat
 +----------------+-------------+------+-----+---------------------+-------------------+

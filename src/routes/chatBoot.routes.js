@@ -1,12 +1,12 @@
 import { Router } from 'express'
 import { getClientes, getClient, updateCliente, reportCliente } from '../controllers/chatBoot.controller.js'
 
-export const chatBootClient = Router()
+export const ChatBoot = Router()
 
-chatBootClient.get('/clientes', getClientes)
+ChatBoot.get('/clientes', getClientes)
 
-chatBootClient.post('/cliente', getClient)
+ChatBoot.post('/cliente', getClient)
 
-chatBootClient.put('/cliente', updateCliente)
+ChatBoot.put('/cliente', updateCliente)
 
-chatBootClient.post('/reportClient', reportCliente)
+ChatBoot.post('/reportClient', reportCliente)

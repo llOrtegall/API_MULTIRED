@@ -1,8 +1,8 @@
 import { Router } from 'express'
 import { createdClientFiel, getClientFiel } from '../controllers/clienteFiel.controller.js'
 
-export const routerCF = Router()
+export const ClienteFiel = Router()
 
-routerCF.post('/getCF', getClientFiel)
+ClienteFiel.post('/getCF', getClientFiel)
 
-routerCF.post('/newCF', createdClientFiel)
+ClienteFiel.post('/newCF', createdClientFiel)
