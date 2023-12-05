@@ -163,14 +163,14 @@ export const changePassword = async (req, res) => {
       return res.status(400).json({ error: 'La nueva contraseña no coinciden' })
     }
     const hashedPassword = await bcrypt.hash(newPassword, BCRYPT_SALT_ROUNDS)
-    const [updateResult] = await connection.query('UPDATE login_chat SET password = ? WHERE username = ?', [hashedPassword, username])
+    const [updateResult] = await pool.query('UPDATE login_chat SET password = ? WHERE username = ?', [hashedPassword, username])
     if (updateResult.affectedRows === 0) {
       throw new Error('No se pudo actualizar la contraseña')
     }
-    res.status(200).json({ message: 'Contraseña Actualizada Correctamente' })
+    return res.status(200).json({ message: 'Contraseña Actualizada Correctamente' })
   } catch (error) {
     pool.end()
-    res.status(500).json({ error })
+    return res.status(500).json({ error })
   } finally {
     pool.end()
   }
