@@ -76,16 +76,19 @@ export const getLogin = async (req, res) => {
     // TODO: Remueve datos sensibles del usuario
     delete result[0].id; delete result[0].password; delete result[0].password2; delete result[0].estado
 
+    // TODO: Parsea el id
+    const { 'BIN_TO_UUID(id)': id, ...rest } = result[0]
+    result[0] = { id, ...rest }
+
     // TODO: envía los respetivas deficiniones de los campos
     result.forEach((element) => {
-      element.estado = State({ estado: element.estado })
       element.empresa = Company({ empresa: element.empresa })
       element.proceso = Proceso({ proceso: element.proceso })
     })
 
     // TODO: Genera el token
-    const token = jwt.sign({ result }, JWT_SECRET, { expiresIn: '1h' })
-    return res.status(200).json({ user: { ...result[0] }, token })
+    const token = jwt.sign({ user: result[0] }, JWT_SECRET, { expiresIn: '1h' })
+    return res.status(200).json({ user: result[0], token })
   } catch (error) {
     pool.end()
     return res.status(401).json({ error })
