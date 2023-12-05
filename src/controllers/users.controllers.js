@@ -1,5 +1,6 @@
 import { connection } from '../databases/userConnectionMysql.js'
 import { Company, Proceso, State } from '../services/Definiciones.js'
+import { ValidarUsuario } from '../../schemas/userSchema.js'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
 import dotenv from 'dotenv'
@@ -72,19 +73,19 @@ export const getLogin = async (req, res) => {
       return res.status(401).json({ error: 'Usuario Inactivo' })
     }
 
-    delete result[0].id
-    delete result[0].password
-    delete result[0].password2
-    delete result[0].estado
+    // TODO: Remueve datos sensibles del usuario
+    delete result[0].id; delete result[0].password; delete result[0].password2; delete result[0].estado
 
+    // TODO: envía los respetivas deficiniones de los campos
     result.forEach((element) => {
       element.estado = State({ estado: element.estado })
       element.empresa = Company({ empresa: element.empresa })
       element.proceso = Proceso({ proceso: element.proceso })
     })
 
+    // TODO: Genera el token
     const token = jwt.sign({ result }, JWT_SECRET, { expiresIn: '1h' })
-    return res.status(200).json({ result, token })
+    return res.status(200).json({ user: { ...result[0] }, token })
   } catch (error) {
     pool.end()
     return res.status(401).json({ error })
@@ -94,33 +95,44 @@ export const getLogin = async (req, res) => {
 }
 
 export const createUser = async (req, res) => {
-  const { nombres, apellidos, documento, telefono, correo, proceso } = req.body
-  if (!nombres || !apellidos || !documento || !telefono || !correo || !proceso) {
-    return res.status(400).json({ error: 'Todos los campos son requeridos' })
+  // TODO: Validar que lleguen los datos requeridos y de forma correcta
+  const result = await ValidarUsuario(req.body)
+
+  if (result.error) {
+    return res.status(400).json({ error: result.error })
   }
+
   const pool = await connection()
 
   try {
-    const [result] = await pool.query('SELECT * FROM login_chat WHERE documento = ?', [documento])
-    if (result.length > 0) {
-      return res.status(409).json({ message: 'Usuario Ya Se Encuentra Registrado' })
+    const { nombres, apellidos, documento, telefono, correo, empresa, proceso, rol } = result.data
+
+    // TODO: Validar que el usuario no exista
+    const [result2] = await pool.query('SELECT documento FROM login_chat WHERE documento = ?', [documento])
+    console.log(result2)
+    if (result2.length > 0) {
+      return res.status(401).json({ error: `El usuario con N° ${documento}, Ya Existe` })
     }
-    const username = `CP${documento}`
-    const password = `CP${documento.slice(-3)}`
-    const hashedPassword = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS)
-    const [UserCreado] = await connection.query(
+
+    // TODO: Generar la contraseña y el username de forma automatica y por defecto
+    const password = `CP${documento.toString().slice(-3)}`
+    const username = `CP${documento.toString()}`
+    const passwordHash = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS)
+
+    // TODO: Guardar el usuario en la base de datos
+    const [UserCreado] = await pool.query(
       `INSERT INTO login_chat (nombres, apellidos, documento, telefono, correo, username, password, estado, empresa, proceso, rol) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, TRUE, 1, ?, 'ninguno');`,
-      [nombres, apellidos, documento, telefono, correo, username, hashedPassword, proceso]
+       VALUES (?, ?, ?, ?, ?, ?, ?, TRUE, ?, ?, ?);`,
+      [nombres, apellidos, documento, telefono, correo, username, passwordHash, empresa, proceso, rol]
     )
+
     if (UserCreado.affectedRows === 1) {
-      res.status(201).json({ message: 'Usuario Registrado Correctamente' })
-    } else {
-      throw new Error('Error al crear el usuario')
+      return res.status(201).json({ message: 'Usuario Registrado Correctamente' })
     }
   } catch (error) {
     pool.end()
-    res.status(500).json({ error: error.message })
+    console.log(error)
+    return res.status(500).json({ error: 'Error al registrar el usuario' })
   } finally {
     pool.end()
   }
