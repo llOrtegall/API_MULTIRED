@@ -37,7 +37,6 @@ export const getUser = async (req, res) => {
   if (!token) {
     return res.status(401).json({ message: 'No se ha enviado el token' })
   }
-
   try {
     const userData = jwt.verify(token, JWT_SECRET)
     res.status(200).json(userData)
@@ -53,24 +52,42 @@ export const getLogin = async (req, res) => {
     return res.status(400).json({ error: 'El usuario y la contraseña son requeridos' })
   }
 
+  // TODO: solicita y espera la conexión a la base de datos
   const pool = await connection()
 
   try {
-    const [result] = await pool.query('SELECT id, nombres, apellidos, correo, username, password, proceso FROM login_chat WHERE username = ?', [user])
+    const [result] = await pool.query('SELECT *, BIN_TO_UUID(id) FROM login_chat WHERE username = ?', [user])
+
     if (result.length === 0) {
       return res.status(401).json({ error: 'El Usuario No Existe' })
     }
-    const { id, nombres, apellidos, correo, username, password: hashedPassword, proceso } = result[0]
-    const passwordMatches = await bcrypt.compare(password, hashedPassword)
 
+    // TODO: Verifica que la contraseña sea correcta
+    const passwordMatches = await bcrypt.compare(password, result[0].password)
     if (!passwordMatches) {
       return res.status(401).json({ error: 'Clave Invalida Retifiquela' })
     }
 
-    const token = jwt.sign({ id, username, nombres, apellidos, correo, proceso }, JWT_SECRET, { expiresIn: '1h' })
-    res.cookie('token', token, { sameSite: 'none', secure: true }).status(200).json({ id, username, nombres, apellidos, correo, proceso, token })
+    if (result[0].estado === 0) {
+      return res.status(401).json({ error: 'Usuario Inactivo' })
+    }
+
+    delete result[0].id
+    delete result[0].password
+    delete result[0].password2
+    delete result[0].estado
+
+    result.forEach((element) => {
+      element.estado = State({ estado: element.estado })
+      element.empresa = Company({ empresa: element.empresa })
+      element.proceso = Proceso({ proceso: element.proceso })
+    })
+
+    const token = jwt.sign({ result }, JWT_SECRET, { expiresIn: '1h' })
+    return res.status(200).json({ result, token })
   } catch (error) {
-    res.status(401).json({ error })
+    pool.end()
+    return res.status(401).json({ error })
   } finally {
     pool.end()
   }
