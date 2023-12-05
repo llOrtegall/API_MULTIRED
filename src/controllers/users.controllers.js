@@ -1,4 +1,5 @@
-import { conecToLoginMysql } from '../mysqlDB.js'
+import { connection } from '../databases/userConnectionMysql.js'
+import { Company, Proceso, State } from '../services/Definiciones.js'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
 import dotenv from 'dotenv'
@@ -10,6 +11,25 @@ const BCRYPT_SALT_ROUNDS = 10
 
 if (!JWT_SECRET) {
   throw new Error('JWT_SECRET no está definida')
+}
+
+export const getUsers = async (req, res) => {
+  const pool = await connection()
+  try {
+    const [result] = await pool.query('SELECT *, BIN_TO_UUID(id) FROM login_chat')
+    result.forEach((element) => {
+      element.estado = State({ estado: element.estado })
+      element.empresa = Company({ empresa: element.empresa })
+      element.proceso = Proceso({ proceso: element.proceso })
+      delete element.id
+    })
+    return res.status(200).json(result)
+  } catch (error) {
+    pool.end()
+    return res.status(500).json({ error: 'Error al obtener los usuarios' })
+  } finally {
+    pool.end()
+  }
 }
 
 export const getUser = async (req, res) => {
@@ -33,22 +53,18 @@ export const getLogin = async (req, res) => {
     return res.status(400).json({ error: 'El usuario y la contraseña son requeridos' })
   }
 
-  const pool = await conecToLoginMysql()
-  const connection = await pool.getConnection()
+  const pool = await connection()
 
   try {
-    const [result] = await connection.query('SELECT id, nombres, apellidos, correo, username, password, proceso FROM login_chat WHERE username = ?', [user])
+    const [result] = await pool.query('SELECT id, nombres, apellidos, correo, username, password, proceso FROM login_chat WHERE username = ?', [user])
     if (result.length === 0) {
-      res.status(401).json({ error: 'El Usuario No Existe' })
-      return
+      return res.status(401).json({ error: 'El Usuario No Existe' })
     }
-    const userData = result[0]
-    const { id, nombres, apellidos, correo, username, password: hashedPassword, proceso } = userData
+    const { id, nombres, apellidos, correo, username, password: hashedPassword, proceso } = result[0]
     const passwordMatches = await bcrypt.compare(password, hashedPassword)
 
     if (!passwordMatches) {
-      res.status(401).json({ error: 'Clave Invalida Retifiquela' })
-      return
+      return res.status(401).json({ error: 'Clave Invalida Retifiquela' })
     }
 
     const token = jwt.sign({ id, username, nombres, apellidos, correo, proceso }, JWT_SECRET, { expiresIn: '1h' })
@@ -56,7 +72,6 @@ export const getLogin = async (req, res) => {
   } catch (error) {
     res.status(401).json({ error })
   } finally {
-    connection.destroy()
     pool.end()
   }
 }
@@ -66,11 +81,10 @@ export const createUser = async (req, res) => {
   if (!nombres || !apellidos || !documento || !telefono || !correo || !proceso) {
     return res.status(400).json({ error: 'Todos los campos son requeridos' })
   }
-  const pool = await conecToLoginMysql()
-  const connection = await pool.getConnection()
+  const pool = await connection()
 
   try {
-    const [result] = await connection.query('SELECT * FROM login_chat WHERE documento = ?', [documento])
+    const [result] = await pool.query('SELECT * FROM login_chat WHERE documento = ?', [documento])
     if (result.length > 0) {
       return res.status(409).json({ message: 'Usuario Ya Se Encuentra Registrado' })
     }
@@ -88,10 +102,9 @@ export const createUser = async (req, res) => {
       throw new Error('Error al crear el usuario')
     }
   } catch (error) {
+    pool.end()
     res.status(500).json({ error: error.message })
-    console.log(error)
   } finally {
-    connection.destroy()
     pool.end()
   }
 }
@@ -102,11 +115,10 @@ export const changePassword = async (req, res) => {
     return res.status(400).json({ error: 'Todos los campos son requeridos' })
   }
 
-  const pool = await conecToLoginMysql()
-  const connection = await pool.getConnection()
+  const pool = await connection()
 
   try {
-    const [users] = await connection.query('SELECT * FROM login_chat WHERE username = ?', [username])
+    const [users] = await pool.query('SELECT * FROM login_chat WHERE username = ?', [username])
     if (users.length === 0) {
       return res.status(401).json({ error: 'Credenciales inválidas' })
     }
@@ -125,9 +137,9 @@ export const changePassword = async (req, res) => {
     }
     res.status(200).json({ message: 'Contraseña Actualizada Correctamente' })
   } catch (error) {
+    pool.end()
     res.status(500).json({ error })
   } finally {
-    connection.destroy()
     pool.end()
   }
 }

@@ -14,15 +14,3 @@ export const conecToMysqlChatBot = async () => {
   })
   return pool
 }
-
-// Creando la conexión Login
-export const conecToLoginMysql = async () => {
-  const pool = createPool({
-    host: process.env.MYSQLLOGIN,
-    user: process.env.USR,
-    password: process.env.PASS,
-    port: process.env.PORT,
-    database: process.env.DATABASE
-  })
-  return pool
-}
