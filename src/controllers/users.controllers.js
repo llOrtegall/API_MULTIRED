@@ -35,14 +35,16 @@ export const getUsers = async (req, res) => {
 
 export const getUser = async (req, res) => {
   const token = req.headers.authorization?.split(' ')[1]
-  if (!token) {
-    return res.status(401).json({ auth: false, message: 'No se ha enviado el token' })
-  }
-  try {
-    const user = jwt.verify(token, JWT_SECRET)
-    res.status(200).json({ auth: true, user })
-  } catch (error) {
-    res.status(401).json({ message: error.message })
+
+  if (token !== 'null' && token !== undefined) {
+    try {
+      const user = jwt.verify(token, JWT_SECRET)
+      return res.status(200).json({ auth: true, user })
+    } catch (error) {
+      return res.status(401).json({ error: 'Token Invalido' })
+    }
+  } else {
+    return res.status(401).json({ error: 'No se ha enviado el token' })
   }
 }
 
