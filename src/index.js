@@ -11,7 +11,8 @@ dotenv.config()
 
 const ACCEPTED_ORIGINS = [
   'http://172.20.1.160',
-  'http://localhost:5173'
+  'http://localhost:5173',
+  'http://172.20.1.110:5173'
 ]
 
 const app = express()
@@ -20,7 +21,6 @@ app.disable('x-powered-by')
 const PORT = process.env.PUERTO_API || 4000
 
 app.use(cors({
-  credentials: true,
   origin: ACCEPTED_ORIGINS
 }))
 
