@@ -5,7 +5,7 @@ export const LoginUser = Router()
 
 LoginUser.post('/login', getLogin)
 
-LoginUser.post('/profile', getUser)
+LoginUser.get('/profile', getUser)
 
 LoginUser.post('/register', createUser)
 

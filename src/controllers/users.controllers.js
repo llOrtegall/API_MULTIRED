@@ -34,13 +34,13 @@ export const getUsers = async (req, res) => {
 }
 
 export const getUser = async (req, res) => {
-  const token = req.body.token
+  const token = req.headers.authorization?.split(' ')[1]
   if (!token) {
-    return res.status(401).json({ message: 'No se ha enviado el token' })
+    return res.status(401).json({ auth: false, message: 'No se ha enviado el token' })
   }
   try {
-    const userData = jwt.verify(token, JWT_SECRET)
-    res.status(200).json(userData)
+    const user = jwt.verify(token, JWT_SECRET)
+    res.status(200).json({ auth: true, user })
   } catch (error) {
     res.status(401).json({ message: error.message })
   }
@@ -52,43 +52,38 @@ export const getLogin = async (req, res) => {
   if (!user || !password) {
     return res.status(400).json({ error: 'El usuario y la contraseña son requeridos' })
   }
-
   // TODO: solicita y espera la conexión a la base de datos
   const pool = await connection()
-
   try {
     const [result] = await pool.query('SELECT *, BIN_TO_UUID(id) FROM login_chat WHERE username = ?', [user])
 
     if (result.length === 0) {
       return res.status(401).json({ error: 'El Usuario No Existe' })
     }
-
     // TODO: Verifica que la contraseña sea correcta
     const passwordMatches = await bcrypt.compare(password, result[0].password)
     if (!passwordMatches) {
       return res.status(401).json({ error: 'Clave Invalida Retifiquela' })
     }
-
     if (result[0].estado === 0) {
       return res.status(401).json({ error: 'Usuario Inactivo' })
     }
-
     // TODO: Remueve datos sensibles del usuario
     delete result[0].id; delete result[0].password; delete result[0].password2; delete result[0].estado
-
     // TODO: Parsea el id
     const { 'BIN_TO_UUID(id)': id, ...rest } = result[0]
     result[0] = { id, ...rest }
-
     // TODO: envía los respetivas deficiniones de los campos
     result.forEach((element) => {
       element.empresa = Company({ empresa: element.empresa })
       element.proceso = Proceso({ proceso: element.proceso })
     })
 
+    console.log(result)
+
     // TODO: Genera el token
-    const token = jwt.sign({ user: result[0] }, JWT_SECRET, { expiresIn: '1h' })
-    return res.status(200).json({ user: result[0], token })
+    const token = jwt.sign(result[0], JWT_SECRET, { expiresIn: '1h' })
+    return res.status(200).json({ auth: true, token })
   } catch (error) {
     pool.end()
     return res.status(401).json({ error })
@@ -100,35 +95,28 @@ export const getLogin = async (req, res) => {
 export const createUser = async (req, res) => {
   // TODO: Validar que lleguen los datos requeridos y de forma correcta
   const result = await ValidarUsuario(req.body)
-
   if (result.error) {
     return res.status(400).json({ error: result.error })
   }
-
   const pool = await connection()
-
   try {
     const { nombres, apellidos, documento, telefono, correo, empresa, proceso, rol } = result.data
-
     // TODO: Validar que el usuario no exista
     const [result2] = await pool.query('SELECT documento FROM login_chat WHERE documento = ?', [documento])
     console.log(result2)
     if (result2.length > 0) {
       return res.status(401).json({ error: `El usuario con N° ${documento}, Ya Existe` })
     }
-
     // TODO: Generar la contraseña y el username de forma automatica y por defecto
     const password = `CP${documento.toString().slice(-3)}`
     const username = `CP${documento.toString()}`
     const passwordHash = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS)
-
     // TODO: Guardar el usuario en la base de datos
     const [UserCreado] = await pool.query(
       `INSERT INTO login_chat (nombres, apellidos, documento, telefono, correo, username, password, estado, empresa, proceso, rol) 
        VALUES (?, ?, ?, ?, ?, ?, ?, TRUE, ?, ?, ?);`,
       [nombres, apellidos, documento, telefono, correo, username, passwordHash, empresa, proceso, rol]
     )
-
     if (UserCreado.affectedRows === 1) {
       return res.status(201).json({ message: 'Usuario Registrado Correctamente' })
     }
