@@ -54,7 +54,8 @@ const userClientSchema = z.object({
   telefono: z.string(),
   correo: z.string(),
   cedula: z.number(),
-  sexoCliente: z.number({ required_error: 'Se Necesita un Sexo' })
+  sexoCliente: z.number({ required_error: 'Se Necesita un Sexo' }),
+  empresa: z.string({ required_error: 'Se Necesita una Empresa' })
 })
 
 export function validateUser (object) {
