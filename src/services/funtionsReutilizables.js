@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer'
 import dotenv from 'dotenv'
 import { htmlSend } from './htmlSend.js'
-import { htmlCreatedUser } from './htmlCreatedUser.js'
+import { htmlCreatedUser, htmlCreatedUserServired } from './htmlCreatedUser.js'
 
 dotenv.config()
 
@@ -89,4 +89,28 @@ export async function resportEmail ({ data }) {
 
   const info = await transporter.sendMail(mailOptions)
   console.log(info)
+}
+
+export async function sendEmailServired ({ userCreado }) {
+  console.log(userCreado)
+  const { nombre, cedula, telefono, correo } = userCreado
+
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS
+    }
+  })
+
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: `${correo}, asistentecomercial@gruposervired.com.co`,
+    subject: 'Usuario Cliente Fiel Creado',
+    html: htmlCreatedUserServired({ nombre, cedula, telefono })
+  }
+
+  const info = await transporter.sendMail(mailOptions)
+  console.log(info)
+  console.log(`Se envia correo a ${correo}`)
 }
