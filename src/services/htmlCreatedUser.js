@@ -78,7 +78,7 @@ export function htmlCreatedUser ({ nombre, cedula, telefono }) {
     
         <article class="art2">
           <p><strong>Estimado(a) ${nombre},</strong></p>
-          <p>Hemos recibido su información suministrada por el ChatBot de la compañoa y tenido el privilegio de trabajar para informarle que su solicitud para crear una cuenta de <span> Cliente Fiel</span> con el <span>Grupo Empresarial Multired</span> (Gane Yumbo) ha sido exitosa. Ahora podrá acumular puntos cada vez que compre formularios de Azar (Chance). en nuestros puntos de venta autorizados del Municipio de Yumbo.</p>
+          <p>Hemos recibido su información suministrada por el ChatBot de la compañia y tenido el privilegio de trabajar para informarle que su solicitud para crear una cuenta de <span> Cliente Fiel</span> con el <span>Grupo Empresarial Multired</span> (Gane Yumbo) ha sido exitosa. Ahora podrá acumular puntos cada vez que compre formularios de Azar (Chance). en nuestros puntos de venta autorizados del Municipio de Yumbo.</p>
         </article>
     
         <article>
@@ -173,7 +173,7 @@ export function htmlCreatedUserServired ({ nombre, cedula, telefono }) {
     
         <article class="art2">
           <p><strong>Estimado(a) ${nombre},</strong></p>
-          <p>Hemos recibido su información suministrada por el ChatBot de la compañoa y tenido el privilegio de trabajar para informarle que su solicitud para crear una cuenta de <span> Cliente Fiel</span> con el <span>Grupo Empresarial Servired</span> (Gane Jamundí) ha sido exitosa. Ahora podrá acumular puntos cada vez que compre formularios de Azar (Chance). en nuestros puntos de venta autorizados del Municipio de Jamundí.</p>
+          <p>Hemos recibido su información suministrada por el ChatBot de la compañia y tenido el privilegio de trabajar para informarle que su solicitud para crear una cuenta de <span> Cliente Fiel</span> con el <span>Grupo Empresarial Servired</span> (Gane Jamundí) ha sido exitosa. Ahora podrá acumular puntos cada vez que compre formularios de Azar (Chance). en nuestros puntos de venta autorizados del Municipio de Jamundí.</p>
         </article>
     
         <article>
