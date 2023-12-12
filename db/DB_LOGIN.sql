@@ -11,7 +11,7 @@ CREATE TABLE login_chat (
   password VARCHAR(80) NOT NULL,
   password2 VARCHAR(80) DEFAULT NULL,
   estado BOOLEAN DEFAULT TRUE NOT NULL,
-  empresa INT DEFAULT 0 CHECK (empresa BETWEEN 0 AND 2), # 0 AMBAS 1 - SERVIRES 2 - MULITRED 
+  empresa INT DEFAULT 0 CHECK (empresa BETWEEN 0 AND 2), # 0 AMBAS 1 - MULTIRED 2 - SERVIRED 
   proceso INT DEFAULT 0 CHECK (proceso BETWEEN 0 AND 9), # 1 -->Técnología 2 -->Contabilidad 3--> Comercial 4--> Administración 
   # 5--> Gestión Humana 6--> Gerencia 7--> Tesoreria 8--> Auditoria 9--> Cumplimiento 
   rol VARCHAR(30),

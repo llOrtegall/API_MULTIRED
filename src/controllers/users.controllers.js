@@ -81,10 +81,11 @@ export const getLogin = async (req, res) => {
       element.proceso = Proceso({ proceso: element.proceso })
     })
 
-    console.log(result)
-
     // TODO: Genera el token
     const token = jwt.sign(result[0], JWT_SECRET, { expiresIn: '1h' })
+
+    console.log(result[0], 'Se ha logueado')
+
     return res.status(200).json({ auth: true, token })
   } catch (error) {
     pool.end()
