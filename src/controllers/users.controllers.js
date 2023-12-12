@@ -52,7 +52,7 @@ export const getLogin = async (req, res) => {
   const { user, password } = req.body
   // TODO: Primero valida que lleguen las credenciales
   if (!user || !password) {
-    return res.status(400).json({ error: 'El usuario y la contraseña son requeridos' })
+    return res.status(400).json({ error: 'El Usuario / Contraseña Son Requeridos' })
   }
   // TODO: solicita y espera la conexión a la base de datos
   const pool = await connection()
@@ -60,15 +60,15 @@ export const getLogin = async (req, res) => {
     const [result] = await pool.query('SELECT *, BIN_TO_UUID(id) FROM login_chat WHERE username = ?', [user])
 
     if (result.length === 0) {
-      return res.status(401).json({ error: 'El Usuario No Existe' })
+      return res.status(401).json({ error: `El Usuario ${user} No Se Encuentra Registrado` })
     }
     // TODO: Verifica que la contraseña sea correcta
     const passwordMatches = await bcrypt.compare(password, result[0].password)
     if (!passwordMatches) {
-      return res.status(401).json({ error: 'Clave Invalida Retifiquela' })
+      return res.status(401).json({ error: 'Contraseña Incorrecta !!!' })
     }
     if (result[0].estado === 0) {
-      return res.status(401).json({ error: 'Usuario Inactivo' })
+      return res.status(401).json({ error: 'Usuario Se Ecuentra Inactivo' })
     }
     // TODO: Remueve datos sensibles del usuario
     delete result[0].id; delete result[0].password; delete result[0].password2; delete result[0].estado
