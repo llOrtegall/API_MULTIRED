@@ -7,9 +7,9 @@ dotenv.config()
 
 export function consultaTable (select) {
   if (select === 'Multired') {
-    return 'SELECT * FROM personayumbo'
+    return 'personayumbo'
   } else if (select === 'Servired') {
-    return 'SELECT * FROM personajamundi'
+    return 'personajamundi'
   }
 }
 
