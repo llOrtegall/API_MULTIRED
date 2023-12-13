@@ -57,6 +57,7 @@ export const updateCliente = async (req, res) => {
 // TODO: Función que reporta a un correo para eliminar Registro
 export const reportCliente = async (req, res) => {
   const data = req.body
+  console.log(data)
   if (!data || !data.motivo || data.motivo === '') {
     return res.status(400).json({ message: 'El motivo es obligatorio' })
   }
