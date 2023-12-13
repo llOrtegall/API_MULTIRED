@@ -1,5 +1,5 @@
-import { connection } from '../databases/userConnectionMysql.js'
 import { Company, Proceso, State } from '../services/Definiciones.js'
+import { getPoolLogin } from '../connections/mysqlLoginDB.js'
 import { ValidarUsuario } from '../../schemas/userSchema.js'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
@@ -15,8 +15,8 @@ if (!JWT_SECRET) {
 }
 
 export const getUsers = async (req, res) => {
-  const pool = await connection()
   try {
+    const pool = await getPoolLogin()
     const [result] = await pool.query('SELECT *, BIN_TO_UUID(id) FROM login_chat')
     result.forEach((element) => {
       element.estado = State({ estado: element.estado })
@@ -26,10 +26,11 @@ export const getUsers = async (req, res) => {
     })
     return res.status(200).json(result)
   } catch (error) {
-    pool.end()
-    return res.status(500).json({ error: 'Error al obtener los usuarios' })
+    console.error(error) // Cambiado a console.error para resaltar errores
+    return res.status(500).json({ error: error.message }) // Incluye el mensaje de error en la respuesta
   } finally {
-    pool.end()
+    console.log('Finaliza la conexion')
+    // No cerramos la conexión aquí porque queremos reutilizarla
   }
 }
 
@@ -55,8 +56,8 @@ export const getLogin = async (req, res) => {
     return res.status(400).json({ error: 'El Usuario / Contraseña Son Requeridos' })
   }
   // TODO: solicita y espera la conexión a la base de datos
-  const pool = await connection()
   try {
+    const pool = await getPoolLogin()
     const [result] = await pool.query('SELECT *, BIN_TO_UUID(id) FROM login_chat WHERE username = ?', [user])
 
     if (result.length === 0) {
@@ -88,10 +89,8 @@ export const getLogin = async (req, res) => {
 
     return res.status(200).json({ auth: true, token })
   } catch (error) {
-    pool.end()
-    return res.status(401).json({ error })
-  } finally {
-    pool.end()
+    console.log(error)
+    return res.status(500).json({ error })
   }
 }
 
@@ -101,8 +100,8 @@ export const createUser = async (req, res) => {
   if (result.error) {
     return res.status(400).json({ error: result.error })
   }
-  const pool = await connection()
   try {
+    const pool = await getPoolLogin()
     const { nombres, apellidos, documento, telefono, correo, empresa, proceso, rol } = result.data
     // TODO: Validar que el usuario no exista
     const [result2] = await pool.query('SELECT documento FROM login_chat WHERE documento = ?', [documento])
@@ -124,11 +123,8 @@ export const createUser = async (req, res) => {
       return res.status(201).json({ message: 'Usuario Registrado Correctamente' })
     }
   } catch (error) {
-    pool.end()
     console.log(error)
     return res.status(500).json({ error: 'Error al registrar el usuario' })
-  } finally {
-    pool.end()
   }
 }
 
@@ -138,9 +134,8 @@ export const changePassword = async (req, res) => {
     return res.status(400).json({ error: 'Todos los campos son requeridos' })
   }
 
-  const pool = await connection()
-
   try {
+    const pool = await getPoolLogin()
     const [users] = await pool.query('SELECT * FROM login_chat WHERE username = ?', [username])
     if (users.length === 0) {
       return res.status(401).json({ error: 'Credenciales inválidas' })
@@ -160,9 +155,6 @@ export const changePassword = async (req, res) => {
     }
     return res.status(200).json({ message: 'Contraseña Actualizada Correctamente' })
   } catch (error) {
-    pool.end()
     return res.status(500).json({ error })
-  } finally {
-    pool.end()
   }
 }
