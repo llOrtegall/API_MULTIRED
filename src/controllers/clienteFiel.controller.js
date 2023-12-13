@@ -1,6 +1,6 @@
 import { obtenerFechaActual, sendEmail, sendEmailServired, separarNombre } from '../services/funtionsReutilizables.js'
 import { validateClientUser } from '../../schemas/userSchema.js'
-import { conectOraDB } from '../oracleDB.js'
+import { conectOraDB } from '../connections/oracleDB.js'
 import { logger } from '../services/logsApp.js'
 
 export const getClientFiel = async (req, res) => {

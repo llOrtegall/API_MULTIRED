@@ -5,6 +5,14 @@ import { htmlCreatedUser, htmlCreatedUserServired } from './htmlCreatedUser.js'
 
 dotenv.config()
 
+export function consultaTable (select) {
+  if (select === 'Multired') {
+    return 'personayumbo'
+  } else if (select === 'Servired') {
+    return 'personajamundi'
+  }
+}
+
 export function separarNombre (nombre) {
   const nombres = nombre.split(' ', 4)
 
@@ -70,7 +78,7 @@ export async function sendEmail ({ userCreado }) {
 
 export async function resportEmail ({ data }) {
   const { nombre, cedula, telefono } = data.client
-  const { motivo } = data
+  const { motivo, emp } = data
 
   const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -84,7 +92,7 @@ export async function resportEmail ({ data }) {
     from: process.env.EMAIL_USER,
     to: process.env.EMAIL_SEND_REPORTS,
     subject: 'Solicitud Elimación Registro Chat Boot',
-    html: htmlSend({ nombre, cedula, telefono, motivo })
+    html: htmlSend({ nombre, cedula, telefono, motivo, emp })
   }
 
   const info = await transporter.sendMail(mailOptions)

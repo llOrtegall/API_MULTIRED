@@ -1,73 +1,34 @@
+import { getPoolChatBot } from '../connections/mysqlDBChatBot.js'
+import { resportEmail, consultaTable } from '../services/funtionsReutilizables.js'
 import { validateUser } from '../../schemas/userSchema.js'
-import { resportEmail } from '../services/funtionsReutilizables.js'
-import { conecToMysqlChatBot } from '../mysqlDB.js'
 import { logger } from '../services/logsApp.js'
 
 // TODO: trae los clientes registrados en x chatBoot
 
 export const getClientes = async (req, res) => {
-  const pool = await conecToMysqlChatBot()
-  const connection = await pool.getConnection()
+  const company = (req.query.select)
+
+  if (!company) {
+    return res.status(400).json({ message: 'El campo table es requerido' })
+  }
+
   try {
+    const pool = await getPoolChatBot()
     if (pool === null) {
       return res.status(500).json({ message: 'Error al establecer la conexión con la base de datos' })
     }
-    const [result] = await connection.query('SELECT * FROM personayumbo')
+    const [result] = await pool.query(`SELECT * FROM ${consultaTable(company)}`)
     res.status(200).json(result)
   } catch (error) {
     logger.error('Error al obtener los clientes', error)
     res.status(500).json({ message: 'Error al obtener los clientes' })
-  } finally {
-    connection.destroy()
-    pool.end()
-  }
-}
-
-export const getClientesServired = async (req, res) => {
-  const pool = await conecToMysqlChatBot()
-  const connection = await pool.getConnection()
-  try {
-    if (pool === null) {
-      return res.status(500).json({ message: 'Error al establecer la conexión con la base de datos' })
-    }
-    const [result] = await connection.query('SELECT * FROM personajamundi')
-    res.status(200).json(result)
-  } catch (error) {
-    logger.error('Error al obtener los clientes', error)
-    res.status(500).json({ message: 'Error al obtener los clientes' })
-  } finally {
-    connection.destroy()
-    pool.end()
-  }
-}
-
-// TODO: trae 1 cliente registrado en chatBoot con la cedula
-export const getClient = async (req, res) => {
-  const { cc } = req.body
-  if (!cc) {
-    return res.status(400).json({ message: 'El campo cc es requerido' })
-  }
-  const pool = await conecToMysqlChatBot()
-  const connection = await pool.getConnection()
-  try {
-    const [result] = await connection.query('SELECT * FROM personayumbo WHERE cedula = ?', [cc])
-    if (result.length > 0) {
-      res.status(200).json(result[0])
-    } else {
-      res.status(404).json({ message: 'Cliente no encontrado' })
-    }
-  } catch (error) {
-    logger.error('Error al obtener el cliente', error)
-    res.status(500).json({ message: 'Error al obtener el cliente' })
-  } finally {
-    connection.destroy()
-    pool.end()
   }
 }
 
 // TODO: Función que actualiza el cliente en Chat Boot
 export const updateCliente = async (req, res) => {
-  const { updateUser } = req.body
+  const { updateUser, emp } = req.body
+
   const result = validateUser(updateUser)
 
   if (!result.success) {
@@ -77,14 +38,12 @@ export const updateCliente = async (req, res) => {
   const { nombre1, nombre2, apellido1, apellido2, telefono, correo, cedula } = result.data
   const nombre = `${nombre1} ${nombre2} ${apellido1} ${apellido2}`.trim().toUpperCase()
 
-  const pool = await conecToMysqlChatBot()
-  const connection = await pool.getConnection()
-
   try {
-    const [result] = await connection.execute('SELECT * FROM personayumbo WHERE cedula = ? ', [cedula])
+    const pool = await getPoolChatBot()
+    const [result] = await pool.execute(`SELECT * FROM ${consultaTable(emp)} WHERE cedula = ? `, [cedula])
     if (result.length > 0) {
-      const query = 'UPDATE personayumbo SET nombre = ?, telefono = ?, correo = ? WHERE cedula = ?'
-      const [result2] = await connection.execute(query, [nombre, telefono, correo, cedula])
+      const query = `UPDATE ${consultaTable(emp)} SET nombre = ?, telefono = ?, correo = ? WHERE cedula = ?`
+      const [result2] = await pool.execute(query, [nombre, telefono, correo, cedula])
       res.status(200).json({ message: 'Cliente Actualizado', detalle: result2 })
     } else {
       res.status(404).json({ message: 'Cliente no encontrado' })
@@ -92,47 +51,13 @@ export const updateCliente = async (req, res) => {
   } catch (error) {
     logger.error('Error al actualizar el cliente', error)
     res.status(500).json({ message: 'Error al actualizar el cliente' })
-  } finally {
-    connection.destroy()
-    pool.end()
-  }
-}
-
-export const updateClienteServired = async (req, res) => {
-  const { updateUser } = req.body
-  const result = validateUser(updateUser)
-
-  if (!result.success) {
-    return res.status(400).json({ message: result.error.message })
-  }
-
-  const { nombre1, nombre2, apellido1, apellido2, telefono, correo, cedula } = result.data
-  const nombre = `${nombre1} ${nombre2} ${apellido1} ${apellido2}`.trim().toUpperCase()
-
-  const pool = await conecToMysqlChatBot()
-  const connection = await pool.getConnection()
-
-  try {
-    const [result] = await connection.execute('SELECT * FROM personajamundi WHERE cedula = ? ', [cedula])
-    if (result.length > 0) {
-      const query = 'UPDATE personajamundi SET nombre = ?, telefono = ?, correo = ? WHERE cedula = ?'
-      const [result2] = await connection.execute(query, [nombre, telefono, correo, cedula])
-      res.status(200).json({ message: 'Cliente Actualizado', detalle: result2 })
-    } else {
-      res.status(404).json({ message: 'Cliente no encontrado' })
-    }
-  } catch (error) {
-    logger.error('Error al actualizar el cliente', error)
-    res.status(500).json({ message: 'Error al actualizar el cliente' })
-  } finally {
-    connection.destroy()
-    pool.end()
   }
 }
 
 // TODO: Función que reporta a un correo para eliminar Registro
 export const reportCliente = async (req, res) => {
   const data = req.body
+  console.log(data)
   if (!data || !data.motivo || data.motivo === '') {
     return res.status(400).json({ message: 'El motivo es obligatorio' })
   }

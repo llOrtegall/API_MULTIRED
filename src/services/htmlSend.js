@@ -1,4 +1,12 @@
-export function htmlSend ({ nombre, cedula, telefono, motivo }) {
+export function htmlSend ({ nombre, cedula, telefono, motivo, emp }) {
+  function Empresa (empresa) {
+    if (empresa === 'Servired') {
+      return 'Grupo Empresarial Servired'
+    } else if (empresa === 'Multired') {
+      return 'Grupo Empresarial Multired'
+    }
+  }
+
   return (
     `
     <!DOCTYPE html>
@@ -77,7 +85,7 @@ export function htmlSend ({ nombre, cedula, telefono, motivo }) {
           Motivo de Eliminación: <span>${motivo}</span>
         </p>
     
-        <p class="footer">Atentamente, <br><br><br> Grupo Empresarial Multired SA</p>
+        <p class="footer">Atentamente, <br><br><br>${Empresa(emp)}</p>
     
         <p class="auto-generated">Generado automáticamente, no responder este correo.</p>
       </div>
