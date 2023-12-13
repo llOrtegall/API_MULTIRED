@@ -5,6 +5,14 @@ import { htmlCreatedUser, htmlCreatedUserServired } from './htmlCreatedUser.js'
 
 dotenv.config()
 
+export function consultaTable (select) {
+  if (select === 'Multired') {
+    return 'SELECT * FROM personayumbo'
+  } else if (select === 'Servired') {
+    return 'SELECT * FROM personajamundi'
+  }
+}
+
 export function separarNombre (nombre) {
   const nombres = nombre.split(' ', 4)
 

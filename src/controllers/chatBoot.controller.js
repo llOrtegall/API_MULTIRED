@@ -1,31 +1,23 @@
-import { validateUser } from '../../schemas/userSchema.js'
-import { resportEmail } from '../services/funtionsReutilizables.js'
 import { getPoolChatBot } from '../connections/mysqlDBChatBot.js'
+import { resportEmail, consultaTable } from '../services/funtionsReutilizables.js'
+import { validateUser } from '../../schemas/userSchema.js'
 import { logger } from '../services/logsApp.js'
 
 // TODO: trae los clientes registrados en x chatBoot
 
 export const getClientes = async (req, res) => {
-  try {
-    const pool = await getPoolChatBot()
-    if (pool === null) {
-      return res.status(500).json({ message: 'Error al establecer la conexión con la base de datos' })
-    }
-    const [result] = await pool.query('SELECT * FROM personayumbo')
-    res.status(200).json(result)
-  } catch (error) {
-    logger.error('Error al obtener los clientes', error)
-    res.status(500).json({ message: 'Error al obtener los clientes' })
-  }
-}
+  const company = (req.query.select)
 
-export const getClientesServired = async (req, res) => {
+  if (!company) {
+    return res.status(400).json({ message: 'El campo table es requerido' })
+  }
+
   try {
     const pool = await getPoolChatBot()
     if (pool === null) {
       return res.status(500).json({ message: 'Error al establecer la conexión con la base de datos' })
     }
-    const [result] = await pool.query('SELECT * FROM personajamundi')
+    const [result] = await pool.query(consultaTable(company))
     res.status(200).json(result)
   } catch (error) {
     logger.error('Error al obtener los clientes', error)
