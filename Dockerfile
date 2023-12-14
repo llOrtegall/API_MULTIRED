@@ -15,3 +15,5 @@ RUN yarn
 EXPOSE 3000
 
 CMD [ "/bin/bash", "./start.sh" ]
+
+# docker run --name nombre_contenedor -p 3000:3000 -d ubuntu_oracle_node:gane_v1.0.2
