@@ -4,4 +4,5 @@ node_modules
 iniciarapi.sh
 combined.log
 error.log
-instantclient_11.2.zip
+instantclient-basic-linux.x64-11.2.0.4.0.zip
+node-v20.10.0-linux-x64.tar.xz
