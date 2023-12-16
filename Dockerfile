@@ -1,19 +1,34 @@
-FROM ubuntu_node_oracle:gane_v1.0.1
+FROM ubuntu:latest
 
 WORKDIR /app
 
 COPY . .
 
-SHELL ["/bin/bash", "-c"]
+RUN mv instantclient-basic-linux.x64-11.2.0.4.0.zip /opt && \
+    mv node-v20.10.0-linux-x64.tar.xz
 
-ENV PATH /opt/node_v20.10/bin:$PATH
-ENV PATH /opt/oracle/instantclient_11_2:$PATH
+WORKDIR /opt
 
-RUN npm install -g yarn
+RUN apt-get update && \
+    apt-get install -y unzip xz-utils libaio1
+
+RUN unzip instantclient-basic-linux.x64-11.2.0.4.0.zip && \
+    tar -xf node-v20.10.0-linux-x64.tar.xz && \
+    rm instantclient-basic-linux.x64-11.2.0.4.0.zip && \
+    rm node-v20.10.0-linux-x64.tar.xz 
+
+RUN npm install --global yarn
+
+RUN cd /instantclient_11_2 && \
+    ln -s libclntsh.so.11.1 libclntsh.so && \
+    ln -s libocci.so.11.1 libocci.so
+
+RUN sh -c "echo /opt/oracle/instantclient_11_2 > \
+      /etc/ld.so.conf.d/oracle-instantclient.conf" && \
+    ldconfig
+
+WORKDIR /app
+
 RUN yarn
 
-EXPOSE 3000
-
-CMD [ "/bin/bash", "./start.sh" ]
-
-# docker run --name nombre_contenedor -p 3000:3000 -d ubuntu_oracle_node:gane_v1.0.2
+CMD [ "start.sh"]
