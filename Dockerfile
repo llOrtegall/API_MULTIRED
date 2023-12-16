@@ -1,4 +1,4 @@
-FROM node:latest
+FROM ubuntu:latest
 
 # Create app directory
 WORKDIR /app
@@ -19,15 +19,19 @@ RUN cd /opt && \
 ENV LD_LIBRARY_PATH=/opt/instantclient_11_2:$LD_LIBRARY_PATH
 ENV PATH=/opt/node-v20.10.0-linux-x64/bin:$PATH
 
+RUN cd /opt/instantclient_11_2 && \
+    ln -s libclntsh.so.11.1 libclntsh.so && \
+    ln -s libocci.so.11.1 libocci.so
+
 RUN sh -c "echo /opt/instantclient_11_2 > \
       /etc/ld.so.conf.d/oracle-instantclient.conf"
 
-RUN npm install -g yarn
-
 RUN ldconfig
+
+RUN npm install -g yarn
 
 RUN yarn
 
 EXPOSE 3000
 
-CMD [ "./start.sh" ]
+CMD [ "yarn", "start" ]
