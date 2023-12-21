@@ -177,7 +177,40 @@ export const forgotPassword = async (req, res) => {
 
     await pool.query('UPDATE login_chat SET resetPasswordToken = ?, resetPasswordExpires = ? WHERE username = ?', [token, now, username])
 
-    res.send({ message: 'Token de restablecimiento de contraseña generado.' })
+    res.status(200).json({ token, username })
+  } catch (error) {
+
+  }
+}
+
+export const ResetPassword = async (req, res) => {
+  const { token, newPassword } = req.body
+
+  console.log(token, newPassword)
+
+  try {
+    const pool = await getPoolLogin()
+    const [result] = await pool.query('SELECT * FROM login_chat WHERE resetPasswordToken = ?', [token])
+
+    console.log(result)
+
+    if (!result) {
+      return res.status(400).send({ error: 'Token inválido o expirado' })
+    }
+
+    const now = new Date()
+
+    if (now > result.passwordResetExpires) {
+      return res.status(400).send({ error: 'Token inválido o expirado' })
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10) // Encripta la nueva contraseña
+
+    const result2 = await pool.query('UPDATE login_chat SET password = ?', [hashedPassword])
+
+    console.log(result2)
+
+    res.status(200).json({ message: 'Contraseña restablecida con éxito.' })
   } catch (error) {
 
   }
