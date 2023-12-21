@@ -3,6 +3,7 @@ import { getPoolLogin } from '../connections/mysqlLoginDB.js'
 import { ValidarUsuario } from '../../schemas/userSchema.js'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
+import crypto from 'crypto'
 import dotenv from 'dotenv'
 
 dotenv.config()
@@ -156,5 +157,28 @@ export const changePassword = async (req, res) => {
     return res.status(200).json({ message: 'Contraseña Actualizada Correctamente' })
   } catch (error) {
     return res.status(500).json({ error })
+  }
+}
+
+export const forgotPassword = async (req, res) => {
+  const { username } = req.body
+
+  try {
+    const pool = await getPoolLogin()
+    const [result] = await pool.query('SELECT username FROM login_chat where username = ?', [username])
+
+    if (result.length === 0) {
+      return res.status(400).json({ error: 'Usuario no encontrado' })
+    }
+
+    const token = crypto.randomBytes(20).toString('hex')
+    const now = new Date()
+    now.setHours(now.getHours() + 1) // token expira en 1 hora
+
+    await pool.query('UPDATE login_chat SET resetPasswordToken = ?, resetPasswordExpires = ? WHERE username = ?', [token, now, username])
+
+    res.send({ message: 'Token de restablecimiento de contraseña generado.' })
+  } catch (error) {
+
   }
 }
