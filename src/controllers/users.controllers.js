@@ -1,4 +1,5 @@
 import { Company, Proceso, State } from '../services/Definiciones.js'
+import { forgotPasswordSend } from '../services/funtionsReutilizables.js'
 import { getPoolLogin } from '../connections/mysqlLoginDB.js'
 import { ValidarUsuario } from '../../schemas/userSchema.js'
 import jwt from 'jsonwebtoken'
@@ -161,58 +162,68 @@ export const changePassword = async (req, res) => {
 }
 
 export const forgotPassword = async (req, res) => {
-  const { username } = req.body
+  const { username, correo } = req.body
 
   const pool = await getPoolLogin()
   try {
-    const [result] = await pool.query('SELECT username FROM login_chat where username = ?', [username])
+    // Busca al usuario en la base de datos utilizando el nombre de usuario o el correo electrónico
+    const [result] = await pool.query('SELECT * FROM login_chat WHERE username = ? AND correo = ?', [username, correo])
+
+    console.log(result)
 
     if (result.length === 0) {
       return res.status(400).json({ error: 'Usuario no encontrado' })
     }
 
-    const token = crypto.randomBytes(20).toString('hex')
+    const token = crypto.randomBytes(40).toString('hex')
     const now = new Date()
-    now.setHours(now.getHours() + 1) // token expira en 1 hora
+    now.setMinutes(now.getMinutes() + 1)
 
-    await pool.query('UPDATE login_chat SET resetPasswordToken = ?, resetPasswordExpires = ? WHERE username = ?', [token, now, username])
+    console.log(now)
 
-    pool.end()
-    res.status(200).json({ token, username })
+    await pool.query('UPDATE login_chat SET resetPasswordToken = ?, resetPasswordExpires = ? WHERE username = ? OR correo = ?', [token, now, username, correo])
+
+    const { nombres, apellidos, documento, empresa, rol } = (result[0])
+    const companyParsed = Company({ empresa })
+    const user = { nombres, apellidos, documento, empresa: companyParsed, rol }
+
+    await forgotPasswordSend({ user, token })
+
+    res.status(200).json({ message: 'Se ha generado la solicitud para recuperar la contraseña' })
   } catch (error) {
-    pool.end()
+    console.log(error)
+    await pool.end()
   }
 }
 
 export const ResetPassword = async (req, res) => {
   const { token, newPassword } = req.body
 
-  console.log(token, newPassword)
-
   const pool = await getPoolLogin()
 
   try {
     const [result] = await pool.query('SELECT * FROM login_chat WHERE resetPasswordToken = ?', [token])
 
-    console.log(result)
-
-    if (result < 0) {
-      return res.status(400).send({ error: 'Token inválido o expirado' })
+    if (result.length === 0) {
+      return res.status(400).send({ error: 'Token inválido' })
     }
 
     const now = new Date()
 
-    console.log(result.passwordResetExpires)
+    console.log(now)
+    console.log(result[0].resetPasswordExpires)
 
-    if (now > result.passwordResetExpires) {
-      return res.status(400).send({ error: 'Token inválido o expirado' })
+    if (now > result[0].resetPasswordExpires) {
+      return res.status(400).send({ error: 'Token expirado' })
     }
 
-    const hashedPassword = await bcrypt.hash(newPassword, BCRYPT_SALT_ROUNDS) // Encripta la nueva contraseña
+    const hashedPassword = await bcrypt.hash(newPassword, BCRYPT_SALT_ROUNDS)
 
     const result2 = await pool.query('UPDATE login_chat SET password = ?, resetPasswordToken = ?, resetPasswordExpires = ?', [hashedPassword, '', null])
 
-    console.log(result2)
+    if (result2.length === 0) {
+      return res.status(400).send({ error: 'Error al recuperar la contraseña' })
+    }
 
     res.status(200).json({ message: 'Contraseña restablecida con éxito.' })
   } catch (error) {

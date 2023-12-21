@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer'
 import dotenv from 'dotenv'
 import { htmlSend } from './htmlSend.js'
-import { htmlCreatedUser, htmlCreatedUserServired } from './htmlCreatedUser.js'
+import { htmlCreatedUser, htmlCreatedUserServired, forgotPasswordEmail } from './htmlCreatedUser.js'
 
 dotenv.config()
 
@@ -121,4 +121,25 @@ export async function sendEmailServired ({ userCreado }) {
   const info = await transporter.sendMail(mailOptions)
   console.log(info)
   console.log(`Se envia correo a ${correo}`)
+}
+
+export async function forgotPasswordSend ({ user, token }) {
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS
+    }
+  })
+
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: 'ivanortega_97@hotmail.com',
+    subject: 'Solicitud Cambio de Contraseña',
+    html: forgotPasswordEmail({ user, token })
+  }
+
+  const info = await transporter.sendMail(mailOptions)
+  console.log(info)
+  // console.log('directortecnologia@gruposervired.com.co')
 }

@@ -187,3 +187,83 @@ export function htmlCreatedUserServired ({ nombre, cedula, telefono }) {
     `
   )
 }
+
+export function forgotPasswordEmail ({ user, token }) {
+  const { nombres, apellidos, documento, empresa, rol } = user
+
+  return (
+        `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Información de Usuario Creada</title>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          margin: 0;
+          padding: 0;
+          background-color: #f4f4f4;
+        }
+    
+        main {
+          max-width: 800px;
+          margin: 0 auto;
+          background-color: #fff;
+          padding: 20px;
+          border-radius: 5px;
+          box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+        }
+    
+        h1 {
+          color: #444;
+        }
+    
+        article {
+          margin-top: 20px;
+          font-size: 1.1rem;
+        }
+    
+        p {
+          line-height: 1.6;
+          color: #666;
+        }
+    
+        span {
+          font-weight: bold;
+        }
+    
+        .art1{
+          display: flex;
+          width: 100%;
+          flex-direction: row;
+          justify-content: space-around;
+        }
+    
+        .art2{
+          text-align: justify;
+        }
+    
+        .pfoter {
+          font-size: 1.2rem;
+          font-weight: bold;
+        }
+      </style>
+    </head>
+    <body>
+      <main>
+        <h2>Solicitud De Restablecimiento De Contraseña</h2>
+        
+        <article class="art2">
+          <p>Se ha generado una solicitud para restablecer la contraseña por el usuario ${nombres} ${apellidos}, con numero de cedula ${documento}</p>
+          <p>Empresa: ${empresa}</p> <p>Rol: ${rol}</p>
+          <p>Para continuar con el proceso de restablecimiento se requiere que el usuario ingrese el siguente Token => <h3> ${token} </h3> <=</p>
+        </article>
+    
+      </main>
+    </body>
+    </html>
+    `
+  )
+}
