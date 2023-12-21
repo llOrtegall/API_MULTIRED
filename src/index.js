@@ -12,8 +12,7 @@ dotenv.config()
 const ACCEPTED_ORIGINS = [
   'http://172.20.1.160',
   'http://localhost:5173',
-  'http://172.20.1.110:5173',
-  'http://172.20.1.110:5174'
+  'http://172.20.1.110:5173'
 ]
 
 const app = express()

@@ -1,11 +1,10 @@
 import { Company, Proceso, State } from '../services/Definiciones.js'
+import { forgotPasswordSend } from '../services/funtionsReutilizables.js'
 import { getPoolLogin } from '../connections/mysqlLoginDB.js'
 import { ValidarUsuario } from '../../schemas/userSchema.js'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
-import dotenv from 'dotenv'
-
-dotenv.config()
+import crypto from 'crypto'
 
 const JWT_SECRET = process.env.JWT_SECRET
 const BCRYPT_SALT_ROUNDS = 10
@@ -156,5 +155,64 @@ export const changePassword = async (req, res) => {
     return res.status(200).json({ message: 'Contraseña Actualizada Correctamente' })
   } catch (error) {
     return res.status(500).json({ error })
+  }
+}
+
+export const forgotPassword = async (req, res) => {
+  const { username, correo } = req.body
+  try {
+    const pool = await getPoolLogin()
+    const [result] = await pool.query('SELECT * FROM login_chat WHERE username = ? AND correo = ?', [username, correo])
+
+    if (result.length === 0) {
+      return res.status(400).json({ error: 'Usuario no encontrado' })
+    }
+
+    const token = crypto.randomBytes(40).toString('hex')
+    const now = new Date()
+    now.setMinutes(now.getMinutes() + 10)
+
+    await pool.query('UPDATE login_chat SET resetPasswordToken = ?, resetPasswordExpires = ? WHERE username = ? OR correo = ?', [token, now, username, correo])
+
+    const { nombres, apellidos, documento, empresa, rol } = (result[0])
+    const companyParsed = Company({ empresa })
+    const user = { nombres, apellidos, documento, empresa: companyParsed, rol }
+
+    await forgotPasswordSend({ user, token })
+
+    res.status(200).json({ message: 'Se ha generado la solicitud para recuperar la contraseña' })
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const ResetPassword = async (req, res) => {
+  const { token, password } = req.body
+
+  try {
+    const pool = await getPoolLogin()
+    const [result] = await pool.query('SELECT * FROM login_chat WHERE resetPasswordToken = ?', [token])
+
+    if (result.length === 0) {
+      return res.status(400).send({ error: 'Token inválido' })
+    }
+
+    const now = new Date()
+
+    if (now > result[0].resetPasswordExpires) {
+      return res.status(400).send({ error: 'Token expirado' })
+    }
+
+    const hashedPassword = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS)
+
+    const result2 = await pool.query('UPDATE login_chat SET password = ?, resetPasswordToken = ?, resetPasswordExpires = ?', [hashedPassword, '', null])
+
+    if (result2.length === 0) {
+      return res.status(400).send({ error: 'Error al recuperar la contraseña' })
+    }
+
+    res.status(200).json({ message: 'Contraseña restablecida con éxito.' })
+  } catch (error) {
+    console.log(error)
   }
 }

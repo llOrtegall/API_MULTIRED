@@ -1,6 +1,5 @@
 FROM ubuntu:latest
 
-# Create app directory
 WORKDIR /app
 
 COPY . .
