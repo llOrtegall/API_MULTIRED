@@ -258,7 +258,8 @@ export function forgotPasswordEmail ({ user, token }) {
         <article class="art2">
           <p>Se ha generado una solicitud para restablecer la contraseña por el usuario ${nombres} ${apellidos}, con numero de cedula ${documento}</p>
           <p>Empresa: ${empresa}</p> <p>Rol: ${rol}</p>
-          <p>Para continuar con el proceso de restablecimiento se requiere que el usuario ingrese el siguente Token => <h3> ${token} </h3> <=</p>
+          <p>Para continuar con el proceso de restablecimiento se requiere que el usuario ingrese el siguente Token: </p>
+          <h3> ${token} </h3> 
         </article>
     
       </main>

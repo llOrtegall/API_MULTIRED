@@ -177,7 +177,7 @@ export const forgotPassword = async (req, res) => {
 
     const token = crypto.randomBytes(40).toString('hex')
     const now = new Date()
-    now.setMinutes(now.getMinutes() + 1)
+    now.setMinutes(now.getMinutes() + 10)
 
     console.log(now)
 
