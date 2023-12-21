@@ -163,8 +163,8 @@ export const changePassword = async (req, res) => {
 export const forgotPassword = async (req, res) => {
   const { username } = req.body
 
+  const pool = await getPoolLogin()
   try {
-    const pool = await getPoolLogin()
     const [result] = await pool.query('SELECT username FROM login_chat where username = ?', [username])
 
     if (result.length === 0) {
@@ -177,9 +177,10 @@ export const forgotPassword = async (req, res) => {
 
     await pool.query('UPDATE login_chat SET resetPasswordToken = ?, resetPasswordExpires = ? WHERE username = ?', [token, now, username])
 
+    pool.end()
     res.status(200).json({ token, username })
   } catch (error) {
-
+    pool.end()
   }
 }
 
@@ -188,30 +189,34 @@ export const ResetPassword = async (req, res) => {
 
   console.log(token, newPassword)
 
+  const pool = await getPoolLogin()
+
   try {
-    const pool = await getPoolLogin()
     const [result] = await pool.query('SELECT * FROM login_chat WHERE resetPasswordToken = ?', [token])
 
     console.log(result)
 
-    if (!result) {
+    if (result < 0) {
       return res.status(400).send({ error: 'Token inválido o expirado' })
     }
 
     const now = new Date()
 
+    console.log(result.passwordResetExpires)
+
     if (now > result.passwordResetExpires) {
       return res.status(400).send({ error: 'Token inválido o expirado' })
     }
 
-    const hashedPassword = await bcrypt.hash(newPassword, 10) // Encripta la nueva contraseña
+    const hashedPassword = await bcrypt.hash(newPassword, BCRYPT_SALT_ROUNDS) // Encripta la nueva contraseña
 
-    const result2 = await pool.query('UPDATE login_chat SET password = ?', [hashedPassword])
+    const result2 = await pool.query('UPDATE login_chat SET password = ?, resetPasswordToken = ?, resetPasswordExpires = ?', [hashedPassword, '', null])
 
     console.log(result2)
 
     res.status(200).json({ message: 'Contraseña restablecida con éxito.' })
   } catch (error) {
-
+    console.log(error)
+    pool.end()
   }
 }
