@@ -134,12 +134,11 @@ export async function forgotPasswordSend ({ user, token }) {
 
   const mailOptions = {
     from: process.env.EMAIL_USER,
-    to: 'ivanortega_97@hotmail.com',
+    to: process.env.EMAIL_SEND_REPORTS,
     subject: 'Solicitud Cambio de Contraseña',
     html: forgotPasswordEmail({ user, token })
   }
 
-  const info = await transporter.sendMail(mailOptions)
-  console.log(info)
-  // console.log('directortecnologia@gruposervired.com.co')
+  await transporter.sendMail(mailOptions)
+  console.log('Se Ha Solicitado Un Reinicio De Contrase Del Usuario')
 }
