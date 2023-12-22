@@ -7,7 +7,7 @@ export function htmlCreatedUser ({ nombre, cedula, telefono }) {
   const redTelefono = lastThreeLetters(telefono.toString())
 
   return (
-        `
+    `
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -102,7 +102,7 @@ export function htmlCreatedUserServired ({ nombre, cedula, telefono }) {
   const redTelefono = lastThreeLetters(telefono.toString())
 
   return (
-        `
+    `
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -189,82 +189,114 @@ export function htmlCreatedUserServired ({ nombre, cedula, telefono }) {
 }
 
 export function forgotPasswordEmail ({ user, token }) {
-  const { nombres, apellidos, documento, empresa, rol } = user
+  const { nombres, apellidos, documento, empresa, rol, correo } = user
 
   return (
-        `
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Información de Usuario Creada</title>
-      <style>
-        body {
-          font-family: Arial, sans-serif;
-          margin: 0;
-          padding: 0;
-          background-color: #f4f4f4;
-        }
-    
-        main {
-          max-width: 800px;
-          margin: 0 auto;
-          background-color: #fff;
-          padding: 20px;
-          border-radius: 5px;
-          box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
-        }
-    
-        h1 {
-          color: #444;
-        }
-    
-        article {
-          margin-top: 20px;
-          font-size: 1.1rem;
-        }
-    
-        p {
-          line-height: 1.6;
-          color: #666;
-        }
-    
-        span {
-          font-weight: bold;
-        }
-    
-        .art1{
-          display: flex;
-          width: 100%;
-          flex-direction: row;
-          justify-content: space-around;
-        }
-    
-        .art2{
-          text-align: justify;
-        }
-    
-        .pfoter {
-          font-size: 1.2rem;
-          font-weight: bold;
-        }
-      </style>
-    </head>
-    <body>
-      <main>
-        <h2>Solicitud De Restablecimiento De Contraseña</h2>
-        
-        <article class="art2">
-          <p>Se ha generado una solicitud para restablecer la contraseña por el usuario ${nombres} ${apellidos}, con numero de cedula ${documento}</p>
-          <p>Empresa: ${empresa}</p> <p>Rol: ${rol}</p>
-          <p>Para continuar con el proceso de restablecimiento se requiere que el usuario ingrese el siguente Token: </p>
-          <h3> ${token} </h3> 
-        </article>
-    
-      </main>
-    </body>
-    </html>
+    `
+        <!DOCTYPE html>
+      <html lang="en">
+
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Información de Usuario Creada</title>
+        <style>
+          * {
+            margin: 0;
+            padding: 0;
+          }
+
+          body {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4d1;
+          }
+
+          main {
+            max-width: 850px;
+            background: rgba(37, 115, 249, 0.9);
+            border-radius: 20px;
+            padding: 1rem;
+          }
+
+          h2 {
+            text-align: center;
+            padding: 1rem;
+            color: #fff;
+          }
+
+          article {
+            padding: 1rem;
+            color: #fff;
+            text-align: justify;
+          }
+
+          p {
+            margin-bottom: 1rem
+          }
+
+          span {
+            color: rgb(0, 0, 0);
+            font-weight: 600;
+          }
+
+          .p-1 {
+            color: rgb(248, 248, 248);
+            font-weight: 600;
+          }
+
+          .p-2{
+            color: rgb(255, 255, 255);
+            font-weight: 600;
+          }
+
+          .token{
+            text-align: center;
+            font-size: 1rem;
+            font-weight: 600;
+            color: rgb(255, 255, 255);
+            background-color: rgb(0, 0, 0);
+            padding: 1rem;
+            border-radius: 10px;
+          }
+
+        </style>
+      </head>
+
+      <body>
+        <main>
+          <h2>Solicitud De Restablecimiento De Contraseña</h2>
+
+          <article class="art2">
+            <h4>Coordial Saludo</h4>
+            <br>
+            <p class="p-1">Se ha generado una solicitud para restablecer la contraseña por el siguiente usuario:
+            <p class="p-2">
+              <br /> Nombres: <span>${nombres} ${apellidos}</span> 
+              <br /> N° Cedula: <span>${documento}</span>
+              <br /> Empresa: <span>${empresa}</span>
+              <br /> Rol: <span>${rol}</span>
+              <br /> Correo: <span>${correo}</span>
+              <br />
+
+            <p>
+              Para continuar con el proceso de restablecimiento se requiere que el usuario ingrese el siguente Token:
+            </p>
+
+            <h5 class="token"> ${token} </h5>
+            <br>
+
+            <p>El proceso de validación del token tiene un tiempo maximo de 10 min, a partir del momento en que es generada la solicitud</p>
+          </article>
+
+        </main>
+      </body>
+
+      </html>
     `
   )
 }

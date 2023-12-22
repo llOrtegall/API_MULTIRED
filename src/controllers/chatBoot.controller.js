@@ -1,5 +1,5 @@
-import { getPoolChatBot } from '../connections/mysqlDBChatBot.js'
 import { resportEmail, consultaTable } from '../services/funtionsReutilizables.js'
+import { getPoolChatBot } from '../connections/mysqlDBChatBot.js'
 import { validateUser } from '../../schemas/userSchema.js'
 import { logger } from '../services/logsApp.js'
 
