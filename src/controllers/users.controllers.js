@@ -15,21 +15,23 @@ if (!JWT_SECRET) {
 
 export const getUsers = async (req, res) => {
   try {
+    // Obtén la pool de conexiones
     const pool = await getPoolLogin()
+
+    // Utiliza la pool para hacer la consulta
     const [result] = await pool.query('SELECT *, BIN_TO_UUID(id) FROM login_chat')
+
     result.forEach((element) => {
       element.estado = State({ estado: element.estado })
       element.empresa = Company({ empresa: element.empresa })
       element.proceso = Proceso({ proceso: element.proceso })
       delete element.id
     })
+
     return res.status(200).json(result)
   } catch (error) {
-    console.error(error) // Cambiado a console.error para resaltar errores
-    return res.status(500).json({ error: error.message }) // Incluye el mensaje de error en la respuesta
-  } finally {
-    console.log('Finaliza la conexion')
-    // No cerramos la conexión aquí porque queremos reutilizarla
+    console.error(error)
+    return res.status(500).json({ error: error.message })
   }
 }
 
@@ -84,11 +86,8 @@ export const getLogin = async (req, res) => {
     // TODO: Genera el token
     const token = jwt.sign(result[0], JWT_SECRET, { expiresIn: '1h' })
 
-    console.log(result[0], 'Se ha logueado')
-
     return res.status(200).json({ auth: true, token })
   } catch (error) {
-    console.log(error)
     return res.status(500).json({ error })
   }
 }
@@ -122,7 +121,6 @@ export const createUser = async (req, res) => {
       return res.status(201).json({ message: 'Usuario Registrado Correctamente' })
     }
   } catch (error) {
-    console.log(error)
     return res.status(500).json({ error: 'Error al registrar el usuario' })
   }
 }
@@ -168,6 +166,7 @@ export const forgotPassword = async (req, res) => {
       return res.status(400).json({ error: 'Usuario no encontrado' })
     }
 
+    // TODO: Generar token y fecha de expiración
     const token = crypto.randomBytes(40).toString('hex')
     const now = new Date()
     now.setMinutes(now.getMinutes() + 10)
@@ -182,7 +181,7 @@ export const forgotPassword = async (req, res) => {
 
     res.status(200).json({ message: 'Se ha generado la solicitud para recuperar la contraseña' })
   } catch (error) {
-    console.log(error)
+    res.status(500).json({ error: 'Error del servidor' })
   }
 }
 
@@ -213,6 +212,6 @@ export const ResetPassword = async (req, res) => {
 
     res.status(200).json({ message: 'Contraseña restablecida con éxito.' })
   } catch (error) {
-    console.log(error)
+    res.status(500).json({ error: 'Error del servidor' + error })
   }
 }
