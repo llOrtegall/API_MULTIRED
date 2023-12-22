@@ -1,5 +1,6 @@
-import { ChatBoot } from './routes/chatBoot.routes.js'
 import { ClienteFiel } from './routes/clienteFiel.routes.js'
+import { mongoDB } from './routes/mongoDB.routes.js'
+import { ChatBoot } from './routes/chatBoot.routes.js'
 import { LoginUser } from './routes/users.routes.js'
 import cookieParser from 'cookie-parser'
 import express from 'express'
@@ -37,6 +38,9 @@ app.use(ClienteFiel)
 
 // TODO: Metodos En Chat Boot DB
 app.use(ChatBoot)
+
+// TODO: Metodos En Mongo DB
+app.use(mongoDB)
 
 app.listen(PORT, () => {
   console.log(`Server Iniciado En El Puerto http://localhost:${PORT}`)
