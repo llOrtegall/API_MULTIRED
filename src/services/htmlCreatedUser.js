@@ -193,9 +193,9 @@ export function forgotPasswordEmail ({ user, token }) {
 
   return (
     `
-        <!DOCTYPE html>
-      <html lang="en">
-
+    <!DOCTYPE html>
+    <html lang="en">
+    
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -205,98 +205,91 @@ export function forgotPasswordEmail ({ user, token }) {
             margin: 0;
             padding: 0;
           }
-
-          body {
-            width: 100vw;
-            height: 100vh;
+      
+          .main {
+            max-width: 600px;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4d1;
-          }
-
-          main {
-            max-width: 850px;
-            background: rgba(37, 115, 249, 0.9);
+            flex-direction: column;
             border-radius: 20px;
             padding: 1rem;
           }
-
+      
           h2 {
             text-align: center;
             padding: 1rem;
-            color: #fff;
           }
-
+      
+          .art2 {
+            display: flex;
+            flex-direction: column;
+          }
+      
           article {
             padding: 1rem;
-            color: #fff;
             text-align: justify;
           }
-
+      
           p {
             margin-bottom: 1rem
           }
-
+      
           span {
+            color: rgb(5, 24, 237);
+            font-weight: 600;
+          }
+      
+          .p-1 {
+            font-weight: 600;
+          }
+      
+          .p-2 {
             color: rgb(0, 0, 0);
             font-weight: 600;
           }
-
-          .p-1 {
-            color: rgb(248, 248, 248);
-            font-weight: 600;
-          }
-
-          .p-2{
-            color: rgb(255, 255, 255);
-            font-weight: 600;
-          }
-
-          .token{
+      
+          .token {
             text-align: center;
             font-size: 1rem;
             font-weight: 600;
-            color: rgb(255, 255, 255);
+            color: rgb(161, 227, 18);
             background-color: rgb(0, 0, 0);
             padding: 1rem;
             border-radius: 10px;
           }
-
         </style>
       </head>
-
+      
       <body>
-        <main>
+        <main class="main">
           <h2>Solicitud De Restablecimiento De Contraseña</h2>
-
-          <article class="art2">
-            <h4>Coordial Saludo</h4>
-            <br>
-            <p class="p-1">Se ha generado una solicitud para restablecer la contraseña por el siguiente usuario:
-            <p class="p-2">
-              <br /> Nombres: <span>${nombres} ${apellidos}</span> 
-              <br /> N° Cedula: <span>${documento}</span>
-              <br /> Empresa: <span>${empresa}</span>
-              <br /> Rol: <span>${rol}</span>
-              <br /> Correo: <span>${correo}</span>
-              <br />
-
-            <p>
-              Para continuar con el proceso de restablecimiento se requiere que el usuario ingrese el siguente Token:
-            </p>
-
-            <h5 class="token"> ${token} </h5>
-            <br>
-
-            <p>El proceso de validación del token tiene un tiempo maximo de 10 min, a partir del momento en que es generada la solicitud</p>
-          </article>
-
+          <br>
+          <h4>Coordial Saludo</h4>
+          <br>
+          <p class="p-1">Se ha generado una solicitud para restablecer la contraseña por el siguiente usuario:
+          <p class="p-2">
+            <br /> Nombres: <span>${nombres} ${apellidos}</span>
+            <br /> N° Cedula: <span>${documento}</span>
+            <br /> Empresa: <span>${empresa}</span>
+            <br /> Rol: <span>${rol}</span>
+            <br /> Correo: <span>${correo}</span>
+            <br />
+      
+          <p>
+            Para continuar con el proceso de restablecimiento se requiere que el usuario ingrese el siguente Token:
+          </p>
+      
+          <h5 class="token"> ${token} </h5>
+          <br>
+      
+          <p>
+            El proceso de validación del token tiene un tiempo maximo de 10 min, a partir del momento en que es generada la
+            solicitud
+          </p>
+      
         </main>
       </body>
-
-      </html>
+    
+    </html>
     `
   )
 }
