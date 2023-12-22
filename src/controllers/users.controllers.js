@@ -175,7 +175,7 @@ export const forgotPassword = async (req, res) => {
 
     const { nombres, apellidos, documento, empresa, rol } = (result[0])
     const companyParsed = Company({ empresa })
-    const user = { nombres, apellidos, documento, empresa: companyParsed, rol }
+    const user = { nombres, apellidos, documento, empresa: companyParsed, rol, correo }
 
     await forgotPasswordSend({ user, token })
 
