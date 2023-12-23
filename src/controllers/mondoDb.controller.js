@@ -107,11 +107,11 @@ export const findBodegaWithItems = async (req, res) => {
     const bodega = await BodegaModel.findOne({ 'items._id': itemId })
 
     if (!bodega) {
-      res.status(404).json({ error: 'No se encontró una bodega con el ítem con el ID proporcionado' })
+      res.status(200).json({ nombreBodega: 'N/A' })
       return
     }
 
-    res.status(200).json(bodega)
+    res.status(200).json({ nombreBodega: bodega.nombre })
   } catch (error) {
     console.error('Error al buscar la bodega:', error)
     res.status(500).json({ error: 'Error al buscar la bodega' })
