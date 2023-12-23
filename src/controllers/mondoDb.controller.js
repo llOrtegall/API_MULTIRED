@@ -137,3 +137,14 @@ export const createMovimiento = async (req, res) => {
     res.status(500).json({ error: 'Error al crear el movimiento' })
   }
 }
+
+export const getMovimientos = async (req, res) => {
+  try {
+    await ConnetMongoDB()
+    const movimientos = await MovimientoModel.find()
+    res.status(200).json(movimientos)
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: 'Error al obtener los movimientos' })
+  }
+}
