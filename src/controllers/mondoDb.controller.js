@@ -1,5 +1,5 @@
 import { ConnetMongoDB } from '../connections/mongoDb.js'
-import { ItemModel, BodegaModel, MovimientoModel } from '../../Models/Item.Model.js'
+import { ItemModel, BodegaModel, MovimientoModel } from '../../Models/Models.js'
 
 export const createItem = async (req, res) => {
   try {
