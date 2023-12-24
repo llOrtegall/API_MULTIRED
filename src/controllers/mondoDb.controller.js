@@ -3,20 +3,28 @@ import { ItemModel, BodegaModel, MovimientoModel } from '../../Models/Models.js'
 
 export const createItem = async (req, res) => {
   try {
-    const { nombre, descripcion, placa, serial, estado, bodega } = req.body
+    const { nombre, descripcion, placa, serial, estado } = req.body
 
     // Validar los datos de entrada
-    if (!nombre || !descripcion || !placa || !serial || !estado || !bodega) {
+    if (!nombre || !descripcion || !placa || !serial || !estado) {
       return res.status(400).json({ error: 'Faltan campos requeridos' })
     }
 
     await ConnetMongoDB()
 
-    const newItem = new ItemModel({ nombre, descripcion, placa, serial, estado, bodega })
+    const newItem = new ItemModel({ nombre, descripcion, placa, serial, estado })
     await newItem.save()
-    res.status(201).json(newItem)
+    res.status(201).json({ message: 'Ítem creado correctamente' })
   } catch (error) {
-    console.error(error)
+    console.log(error)
+
+    if (error.code === 11000) {
+      const Code = error.code
+      const Value = error.keyValue[Object.keys(error.keyValue)[0]]
+      return res.status(400)
+        .json({ error: `Error: ${Code}, El Item ${Value} Ya Existe` })
+    }
+
     res.status(500).json({ error: 'Error al crear el ítem' })
   }
 }
@@ -33,9 +41,8 @@ export const getItems = async (req, res) => {
 }
 
 export const createBodega = async (req, res) => {
+  const { nombre, sucursal, direccion } = req.body
   try {
-    const { nombre, sucursal, direccion } = req.body
-
     // Validar los datos de entrada
     if (!nombre || !sucursal || !direccion) {
       return res.status(400).json({ error: 'Faltan campos requeridos' })
@@ -45,7 +52,7 @@ export const createBodega = async (req, res) => {
 
     const newBodega = new BodegaModel({ nombre, sucursal, direccion })
     await newBodega.save()
-    res.status(201).json(newBodega)
+    res.status(201).json({ message: 'Bodega creada correctamente' })
   } catch (error) {
     console.error(error)
     res.status(500).json({ error: 'Error al crear la bodega' })
