@@ -105,8 +105,10 @@ export const addItemToBodega = async (req, res) => {
 
     res.status(200).json({ message: `Ítem agregado correctamente a Bodega: ${sucursal}` })
   } catch (error) {
-    console.error(error)
-    res.status(500).json({ error: 'Error al agregar el ítem a bodega' })
+    if (error.code === 11000) {
+      return res.status(400).json({ error: 'El ítem ya está asignado a otra bodega' })
+    }
+    return res.status(500).json({ error: 'Error al agregar el ítem a bodega', message: error })
   }
 }
 
