@@ -12,7 +12,7 @@ const bodegaSchema = new Schema({
   nombre: { type: String, required: true },
   sucursal: { type: String, required: true, unique: true },
   direccion: { type: String, required: true },
-  items: [itemSchema]
+  items: { type: [itemSchema], required: false }
 }, { timestamps: true, versionKey: false })
 
 const movimientoSchema = new Schema({

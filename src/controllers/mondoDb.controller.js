@@ -73,30 +73,35 @@ export const getBodegas = async (req, res) => {
 export const addItemToBodega = async (req, res) => {
   const { sucursal, itemId } = req.body
 
-  console.log(itemId)
-
   try {
     await ConnetMongoDB()
     // Encuentra el ítem por su ID
     const item = await ItemModel.findById(itemId)
-    console.log(item)
+
     if (!item) {
-      console.log('No se encontró el ítem con el ID proporcionado')
       res.status(404).json({ error: 'No se encontró el ítem con el ID proporcionado' })
       return
     }
 
-    // Encuentra la bodega por su ID y agrega el ítem al array de items
-    const bodega = await BodegaModel.findOneAndUpdate(
-      { sucursal },
-      { $push: { items: item } },
-      { new: true, useFindAndModify: false }
-    )
+    // Encuentra la bodega por su sucursal
+    const bodega = await BodegaModel.findOne({ sucursal })
 
     if (!bodega) {
-      res.status(404).json({ error: 'No se encontró la bodega con el ID proporcionado' })
+      res.status(404).json({ error: 'No se encontró la bodega con la sucursal proporcionada' })
       return
     }
+
+    // Verifica si el ítem ya existe en la bodega
+    const itemExists = bodega.items.some(existingItem => existingItem._id.toString() === itemId)
+
+    if (itemExists) {
+      res.status(400).json({ error: 'El ítem ya existe en la bodega' })
+      return
+    }
+
+    // Agrega el ítem al array de items
+    bodega.items.push(item)
+    await bodega.save()
 
     res.status(200).json({ message: `Ítem agregado correctamente a Bodega: ${sucursal}` })
   } catch (error) {
