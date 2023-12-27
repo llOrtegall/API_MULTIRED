@@ -18,6 +18,7 @@ const bodegaSchema = new Schema({
 const movimientoSchema = new Schema({
   encargado: { type: String, required: true },
   incidente: { type: String, required: true },
+  descripcion: { type: String, required: true },
   fecha: { type: Date, required: true },
   tipo: { type: String, required: true, enum: ['Entrada', 'Salida'] },
   item: { type: Schema.Types.ObjectId, ref: 'item' },
