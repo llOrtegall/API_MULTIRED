@@ -73,6 +73,7 @@ export const getBodegas = async (req, res) => {
     res.status(500).json({ error: 'Error al obtener las bodegas' })
   }
 }
+
 export const addItemToBodega = async (req, res) => {
   const { sucursal, itemId } = req.body
 
@@ -144,7 +145,7 @@ export const createMovimiento = async (req, res) => {
 export const getMovimientos = async (req, res) => {
   try {
     await ConnetMongoDB()
-    const movimientos = await MovimientoModel.find()
+    const movimientos = await MovimientoModel.find().populate('items').populate('bodegaOrigen').populate('bodegaDestino')
     res.status(200).json(movimientos)
   } catch (error) {
     console.error(error)
@@ -183,17 +184,6 @@ export const moveItems = async (req, res) => {
       targetBodega.items.push(item)
     }
 
-    // const movimientoSchema = new Schema({
-    //   encargado: { type: String, required: true },
-    //   incidente: { type: String, required: true },
-    //   descripcion: { type: String, required: true },
-    //   fecha: { type: Date, required: true },
-    //   tipo: { type: String, required: true, enum: ['Entrada', 'Salida'] },
-    //   items: [{ type: Schema.Types.ObjectId, ref: 'item' }],
-    //   bodegaOrigen: { type: Schema.Types.ObjectId, ref: 'bodega' },
-    //   bodegaDestino: { type: Schema.Types.ObjectId, ref: 'bodega' }
-    // }, { timestamps: true, versionKey: false })
-
     // Crea el movimiento
     const movimiento = new MovimientoModel({
       encargado: 'Ivan Ortega',
@@ -223,7 +213,7 @@ export const getBodegaSucursal = async (req, res) => {
   const { sucursal } = req.params
   try {
     await ConnetMongoDB()
-    const bodega = await BodegaModel.findOne({ sucursal })
+    const bodega = await BodegaModel.findOne({ sucursal }).populate('items')
     res.status(200).json(bodega)
   } catch (error) {
     console.error(error)
