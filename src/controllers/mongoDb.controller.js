@@ -167,40 +167,57 @@ export const getMovimientos = async (req, res) => {
   }
 }
 
-export const moveItem = async (req, res) => {
-  const { itemId, origenBodegaId, bodegaDestinoId } = req.body
-  console.log(itemId, origenBodegaId, bodegaDestinoId)
+export const moveItems = async (req, res) => {
+  const { itemsIds, bodegaOrigen, bodegaDestino } = req.body
 
   try {
     await ConnetMongoDB()
     // Encuentra las bodegas
-    const sourceBodega = await BodegaModel.findById(origenBodegaId)
-    const targetBodega = await BodegaModel.findById(bodegaDestinoId)
+    const sourceBodega = await BodegaModel.findById(bodegaOrigen)
+    const targetBodega = await BodegaModel.findById(bodegaDestino)
 
     // Verifica si las bodegas existen
     if (!sourceBodega || !targetBodega) {
       return res.status(404).json({ error: 'No se encontró una o ambas bodegas' })
     }
 
-    // Encuentra el ítem en la bodega original
-    const itemIndex = sourceBodega.items.findIndex(item => item._id.toString() === itemId)
+    // Mueve cada ítem del array itemsIdsmoveItems
+    for (const itemId of itemsIds) {
+      // Encuentra el ítem en la bodega original
+      const itemIndex = sourceBodega.items.findIndex(item => item._id.toString() === itemId)
 
-    // Verifica si el ítem existe en la bodega original
-    if (itemIndex === -1) {
-      return res.status(404).json({ error: 'No se encontró el ítem en la bodega de Origen' })
+      // Verifica si el ítem existe en la bodega original
+      if (itemIndex === -1) {
+        return res.status(404).json({ error: `No se encontró el ítem con id ${itemId} en la bodega original` })
+      }
+
+      // Elimina el ítem de la bodega original
+      const [item] = sourceBodega.items.splice(itemIndex, 1)
+
+      // Agrega el ítem a la bodega de destino
+      targetBodega.items.push(item)
     }
 
-    // Elimina el ítem de la bodega original
-    const [item] = sourceBodega.items.splice(itemIndex, 1)
+    // Guarda los cambios en las bodegas
     await sourceBodega.save()
-
-    // Agrega el ítem a la bodega de destino
-    targetBodega.items.push(item)
     await targetBodega.save()
 
-    res.status(200).json({ message: 'Ítem movido con éxito' })
+    res.status(200).json({ message: 'Ítems movidos con éxito' })
   } catch (error) {
     console.error(error)
-    res.status(500).json({ error: 'Error al mover el ítem' })
+    res.status(500).json({ error: 'Error al mover los ítems' })
+  }
+}
+
+export const getBodegaSucursal = async (req, res) => {
+  console.log(req.params)
+  const { sucursal } = req.params
+  try {
+    await ConnetMongoDB()
+    const bodega = await BodegaModel.findOne({ sucursal })
+    res.status(200).json(bodega)
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: 'Error al obtener la bodega' })
   }
 }
