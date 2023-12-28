@@ -66,52 +66,41 @@ export const createBodega = async (req, res) => {
 export const getBodegas = async (req, res) => {
   try {
     await ConnetMongoDB()
-    const bodegas = await BodegaModel.find()
+    const bodegas = await BodegaModel.find().populate('items')
     res.status(200).json(bodegas)
   } catch (error) {
     console.error(error)
     res.status(500).json({ error: 'Error al obtener las bodegas' })
   }
 }
-
 export const addItemToBodega = async (req, res) => {
   const { sucursal, itemId } = req.body
 
   try {
     await ConnetMongoDB()
-    // Encuentra el ítem por su ID
     const item = await ItemModel.findById(itemId)
-
     if (!item) {
       res.status(404).json({ error: 'No se encontró el ítem con el ID proporcionado' })
       return
     }
 
-    // Encuentra la bodega por su sucursal
-    const bodega = await BodegaModel.findOne({ sucursal })
+    // Verifica si el ítem ya está en alguna bodega
+    const existingBodega = await BodegaModel.findOne({ items: itemId })
+    if (existingBodega) {
+      res.status(400).json({ error: 'El ítem ya está en otra bodega' })
+      return
+    }
 
+    const bodega = await BodegaModel.findOne({ sucursal })
     if (!bodega) {
       res.status(404).json({ error: 'No se encontró la bodega con la sucursal proporcionada' })
       return
     }
 
-    // Verifica si el ítem ya existe en la bodega
-    const itemExists = bodega.items.some(existingItem => existingItem._id.toString() === itemId)
-
-    if (itemExists) {
-      res.status(400).json({ error: 'El ítem ya existe en la bodega' })
-      return
-    }
-
-    // Agrega el ítem al array de items
-    bodega.items.push(item)
+    bodega.items.push(item._id)
     await bodega.save()
-
     res.status(200).json({ message: `Ítem agregado correctamente a Bodega: ${sucursal}` })
   } catch (error) {
-    if (error.code === 11000) {
-      return res.status(400).json({ error: 'El ítem ya está asignado a otra bodega' })
-    }
     return res.status(500).json({ error: 'Error al agregar el ítem a bodega', message: error })
   }
 }
@@ -121,18 +110,14 @@ export const findBodegaWithItems = async (req, res) => {
 
   try {
     await ConnetMongoDB()
-    // Encuentra la bodega que contiene el ítem con el ID proporcionado
-    const bodega = await BodegaModel.findOne({ 'items._id': itemId })
-
+    const bodega = await BodegaModel.findOne({ items: itemId })
     if (!bodega) {
-      res.status(200).json({ nombreBodega: 'N/A' })
-      return
+      return res.status(404).json({ error: 'No se encontró una bodega con el ítem especificado' })
     }
-
     res.status(200).json({ nombreBodega: bodega.nombre })
   } catch (error) {
-    console.error('Error al buscar la bodega:', error)
-    res.status(500).json({ error: 'Error al buscar la bodega' })
+    console.error(error)
+    res.status(500).json({ error: 'Error al obtener la bodega' })
   }
 }
 
@@ -197,6 +182,30 @@ export const moveItems = async (req, res) => {
       // Agrega el ítem a la bodega de destino
       targetBodega.items.push(item)
     }
+
+    // const movimientoSchema = new Schema({
+    //   encargado: { type: String, required: true },
+    //   incidente: { type: String, required: true },
+    //   descripcion: { type: String, required: true },
+    //   fecha: { type: Date, required: true },
+    //   tipo: { type: String, required: true, enum: ['Entrada', 'Salida'] },
+    //   items: [{ type: Schema.Types.ObjectId, ref: 'item' }],
+    //   bodegaOrigen: { type: Schema.Types.ObjectId, ref: 'bodega' },
+    //   bodegaDestino: { type: Schema.Types.ObjectId, ref: 'bodega' }
+    // }, { timestamps: true, versionKey: false })
+
+    // Crea el movimiento
+    const movimiento = new MovimientoModel({
+      encargado: 'Ivan Ortega',
+      incidente: '11154',
+      descripcion: 'Movimiento de ítems bodega principal a stock',
+      fecha: new Date(),
+      items: itemsIds,
+      bodegaOrigen,
+      bodegaDestino
+    })
+    // Guarda el movimiento
+    await movimiento.save()
 
     // Guarda los cambios en las bodegas
     await sourceBodega.save()
