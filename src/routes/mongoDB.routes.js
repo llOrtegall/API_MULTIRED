@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { createItem, getItems, createBodega, addItemToBodega, findBodegaWithItems, getBodegas, createMovimiento, getMovimientos, moveItems, getBodegaSucursal } from '../controllers/mongoDb.controller.js'
+import { createItem, getItems, createBodega, addItemToBodega, findBodegaWithItems, getBodegas, getMovimientos, moveItems, getBodegaSucursal } from '../controllers/mongoDb.controller.js'
 
 export const mongoDB = Router()
 
@@ -16,8 +16,6 @@ mongoDB.post('/findBodegaWithItems', findBodegaWithItems)
 mongoDB.get('/getBodegas', getBodegas)
 
 mongoDB.get('/getBodega/:sucursal', getBodegaSucursal)
-
-mongoDB.post('/createMovimiento', createMovimiento)
 
 mongoDB.get('/getMovimientos', getMovimientos)
 

@@ -122,26 +122,6 @@ export const findBodegaWithItems = async (req, res) => {
   }
 }
 
-export const createMovimiento = async (req, res) => {
-  try {
-    const { encargado, incidente, fecha, tipo, item, bodega } = req.body
-
-    // Validar los datos de entrada
-    if (!encargado || !incidente || !fecha || !tipo || !item || !bodega) {
-      return res.status(400).json({ error: 'Faltan campos requeridos' })
-    }
-
-    await ConnetMongoDB()
-
-    const newMovimiento = new MovimientoModel({ encargado, incidente, fecha, tipo, item, bodega })
-    await newMovimiento.save()
-    res.status(201).json(newMovimiento)
-  } catch (error) {
-    console.error(error)
-    res.status(500).json({ error: 'Error al crear el movimiento' })
-  }
-}
-
 export const getMovimientos = async (req, res) => {
   try {
     await ConnetMongoDB()
@@ -154,7 +134,11 @@ export const getMovimientos = async (req, res) => {
 }
 
 export const moveItems = async (req, res) => {
-  const { itemsIds, bodegaOrigen, bodegaDestino } = req.body
+  const { itemsIds, bodegaOrigen, bodegaDestino, encargado, incidente, descripcion } = req.body
+
+  if (!itemsIds || !bodegaOrigen || !bodegaDestino || !encargado || !incidente || !descripcion) {
+    return res.status(400).json({ error: 'Faltan campos requeridos' })
+  }
 
   try {
     await ConnetMongoDB()
@@ -186,9 +170,9 @@ export const moveItems = async (req, res) => {
 
     // Crea el movimiento
     const movimiento = new MovimientoModel({
-      encargado: 'Ivan Ortega',
-      incidente: '11154',
-      descripcion: 'Movimiento de ítems bodega principal a stock',
+      encargado,
+      incidente,
+      descripcion,
       fecha: new Date(),
       items: itemsIds,
       bodegaOrigen,
