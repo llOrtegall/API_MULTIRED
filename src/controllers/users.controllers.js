@@ -195,7 +195,6 @@ export const ResetPassword = async (req, res) => {
     if (result.length === 0) {
       return res.status(400).send({ error: 'Token inválido' })
     }
-
     const now = new Date()
 
     if (now > result[0].resetPasswordExpires) {
@@ -203,8 +202,7 @@ export const ResetPassword = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS)
-
-    const result2 = await pool.query('UPDATE login_chat SET password = ?, resetPasswordToken = ?, resetPasswordExpires = ?', [hashedPassword, '', null])
+    const result2 = await pool.query('UPDATE login_chat SET password = ?, resetPasswordToken = ?, resetPasswordExpires = ? WHERE resetPasswordToken = ?', [hashedPassword, '', null, token])
 
     if (result2.length === 0) {
       return res.status(400).send({ error: 'Error al recuperar la contraseña' })
