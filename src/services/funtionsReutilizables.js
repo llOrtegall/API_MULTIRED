@@ -140,5 +140,5 @@ export async function forgotPasswordSend ({ user, token }) {
   }
 
   await transporter.sendMail(mailOptions)
-  console.log('Se Ha Solicitado Un Reinicio De Contrase Del Usuario')
+  console.log('Se Ha Solicitado Un Reinicio De Contraseña')
 }
