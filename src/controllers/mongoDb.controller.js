@@ -58,7 +58,12 @@ export const createBodega = async (req, res) => {
     await newBodega.save()
     res.status(201).json({ message: 'Bodega creada correctamente' })
   } catch (error) {
-    console.error(error)
+    if (error.code === 11000) {
+      const Code = error.code
+      const Value = error.keyValue[Object.keys(error.keyValue)[0]]
+      return res.status(400)
+        .json({ error: `Error: ${Code}, La Bodega Con N° Sucursal: ${Value} Ya Existe ¡¡¡` })
+    }
     res.status(500).json({ error: 'Error al crear la bodega' })
   }
 }
