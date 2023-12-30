@@ -80,22 +80,10 @@ export const getBodegas = async (req, res) => {
 }
 
 export const addItemToBodega = async (req, res) => {
-  const { sucursal, itemId } = req.body
+  const { sucursal, itemIds } = req.body
 
   try {
     await ConnetMongoDB()
-    const item = await ItemModel.findById(itemId)
-    if (!item) {
-      res.status(404).json({ error: 'No se encontró el ítem con el ID proporcionado' })
-      return
-    }
-
-    // Verifica si el ítem ya está en alguna bodega
-    const existingBodega = await BodegaModel.findOne({ items: itemId })
-    if (existingBodega) {
-      res.status(400).json({ error: 'El ítem ya está en otra bodega' })
-      return
-    }
 
     const bodega = await BodegaModel.findOne({ sucursal })
     if (!bodega) {
@@ -103,27 +91,47 @@ export const addItemToBodega = async (req, res) => {
       return
     }
 
-    bodega.items.push(item._id)
+    for (const itemId of itemIds) {
+      const item = await ItemModel.findById(itemId)
+      if (!item) {
+        res.status(404).json({ error: `No se encontró el ítem con el ID: ${itemId}` })
+        return
+      }
+
+      // Verifica si el ítem ya está en alguna bodega
+      const existingBodega = await BodegaModel.findOne({ items: itemId })
+      if (existingBodega) {
+        res.status(400).json({ error: `El ítem con el ID: ${itemId} ya está en otra bodega` })
+        return
+      }
+
+      bodega.items.push(item._id)
+    }
+
     await bodega.save()
-    res.status(200).json({ message: `Ítem agregado correctamente a Bodega: ${sucursal}` })
+    res.status(200).json({ message: `Ítems agregados correctamente a Bodega: ${sucursal}` })
   } catch (error) {
-    return res.status(500).json({ error: 'Error al agregar el ítem a bodega', message: error })
+    return res.status(500).json({ error: 'Error al agregar los ítems a bodega', message: error })
   }
 }
 
 export const findBodegaWithItems = async (req, res) => {
-  const { itemId } = req.body
-
   try {
     await ConnetMongoDB()
-    const bodega = await BodegaModel.findOne({ items: itemId })
-    if (!bodega) {
-      return res.status(404).json({ error: 'No se encontró una bodega con el ítem especificado' })
-    }
-    res.status(200).json({ nombreBodega: bodega.nombre })
+    const items = await ItemModel.find()
+
+    const itemsWithBodegas = await Promise.all(items.map(async (item) => {
+      const bodega = await BodegaModel.findOne({ items: item._id })
+      return {
+        itemId: item._id,
+        nombreBodega: bodega ? bodega.nombre : 'N/A'
+      }
+    }))
+
+    res.status(200).json(itemsWithBodegas)
   } catch (error) {
     console.error(error)
-    res.status(500).json({ error: 'Error al obtener la bodega' })
+    res.status(500).json({ error: 'Error al obtener los ítems y las bodegas' })
   }
 }
 

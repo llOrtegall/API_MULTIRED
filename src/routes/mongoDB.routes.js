@@ -11,7 +11,7 @@ mongoDB.post('/createBodega', createBodega)
 
 mongoDB.post('/addItemToBodega', addItemToBodega)
 
-mongoDB.post('/findBodegaWithItems', findBodegaWithItems)
+mongoDB.get('/findBodegaWithItems', findBodegaWithItems)
 
 mongoDB.get('/getBodegas', getBodegas)
 
