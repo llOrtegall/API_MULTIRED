@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { createItem, getItems, createBodega, addItemToBodega, findBodegaWithItems, getBodegas, getMovimientos, moveItems, getBodegaSucursal } from '../controllers/mongoDb.controller.js'
+import { createItem, getItems, createBodega, addItemToBodega, findBodegaWithItems, getBodegas, getMovimientos, moveItems, getBodegaSucursal, getMovimiento } from '../controllers/mongoDb.controller.js'
 
 export const mongoDB = Router()
 
@@ -18,5 +18,7 @@ mongoDB.get('/getBodegas', getBodegas)
 mongoDB.get('/getBodega/:sucursal', getBodegaSucursal)
 
 mongoDB.get('/getMovimientos', getMovimientos)
+
+mongoDB.get('/movimiento/:id', getMovimiento)
 
 mongoDB.post('/moveItem', moveItems)

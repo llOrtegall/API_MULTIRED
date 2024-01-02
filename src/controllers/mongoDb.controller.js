@@ -222,3 +222,15 @@ export const getBodegaSucursal = async (req, res) => {
     res.status(500).json({ error: 'Error al obtener la bodega' })
   }
 }
+
+export const getMovimiento = async (req, res) => {
+  const { id } = req.params
+  try {
+    await ConnetMongoDB()
+    const movimiento = await MovimientoModel.findById(id).populate('items').populate('bodegaOrigen').populate('bodegaDestino')
+    res.status(200).json(movimiento)
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: 'Error al obtener el movimiento' })
+  }
+}
