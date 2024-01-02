@@ -154,6 +154,10 @@ export const moveItems = async (req, res) => {
     return res.status(400).json({ error: 'Faltan campos requeridos' })
   }
 
+  if (bodegaOrigen === bodegaDestino) {
+    return res.status(400).json({ error: 'La bodega de origen y destino deben ser diferentes' })
+  }
+
   try {
     await ConnetMongoDB()
     // Encuentra las bodegas
