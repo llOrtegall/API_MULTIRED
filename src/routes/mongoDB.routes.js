@@ -9,7 +9,7 @@ mongoDB.get('/getItems', getItems)
 
 mongoDB.post('/createBodega', createBodega)
 
-mongoDB.post('/addItemToBodega', addItemToBodega)
+mongoDB.post('/addItemsToBodega', addItemToBodega)
 
 mongoDB.get('/findBodegaWithItems', findBodegaWithItems)
 
