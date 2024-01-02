@@ -1,5 +1,6 @@
-import { ConnetMongoDB } from '../connections/mongoDb.js'
 import { ItemModel, BodegaModel, MovimientoModel } from '../../Models/Models.js'
+import { ConnetMongoDB } from '../connections/mongoDb.js'
+import moment from 'moment-timezone'
 
 export const createItem = async (req, res) => {
   try {
@@ -186,7 +187,7 @@ export const moveItems = async (req, res) => {
       encargado,
       incidente,
       descripcion,
-      fecha: new Date(),
+      fecha: moment().tz('America/Bogota').toDate(),
       items: itemsIds,
       bodegaOrigen,
       bodegaDestino
