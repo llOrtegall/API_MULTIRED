@@ -154,8 +154,12 @@ export const moveItems = async (req, res) => {
     return res.status(400).json({ error: 'Faltan campos requeridos' })
   }
 
+  if (itemsIds.length === 0) {
+    return res.status(400).json({ error: 'Debe seleccionar al menos un ítem' })
+  }
+
   if (bodegaOrigen === bodegaDestino) {
-    return res.status(400).json({ error: 'La bodega de origen y destino deben ser diferentes' })
+    return res.status(400).json({ error: 'La bodega de Origen y Destino deben ser Diferentes' })
   }
 
   try {
