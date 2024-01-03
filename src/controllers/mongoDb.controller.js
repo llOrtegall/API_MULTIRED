@@ -205,7 +205,14 @@ export const moveItems = async (req, res) => {
 
     res.status(200).json({ message: 'Ítems movidos con éxito' })
   } catch (error) {
-    console.error(error)
+    if (error.code === 11000) {
+      console.log(error)
+      const Code = error.code
+      const name = Object.keys(error.keyValue)[0]
+      const Value = error.keyValue[Object.keys(error.keyValue)[0]]
+      return res.status(400)
+        .json({ error: `Error: ${Code}, El ${name} = ${Value} Ya Existe` })
+    }
     res.status(500).json({ error: 'Error al mover los ítems' })
   }
 }
