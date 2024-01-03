@@ -1,5 +1,15 @@
 import { Schema, model } from 'mongoose'
 
+const SimcardSchema = new Schema({
+  numero: { type: String, unique: true },
+  operador: { type: String, required: true, enum: ['Claro', 'Movistar', 'Tigo'] },
+  estado: { type: String, required: true, enum: ['Activa', 'Inactiva', 'DeBaja'] },
+  serial: { type: String, required: true, unique: true },
+  apn: { type: String, required: true },
+  user: { type: String },
+  pass: { type: String }
+})
+
 const ItemSchema = new Schema({
   nombre: { type: String, required: true },
   descripcion: { type: String, required: true },
@@ -12,7 +22,6 @@ const bodegaSchema = new Schema({
   nombre: { type: String, required: true },
   sucursal: { type: String, required: true, unique: true },
   direccion: { type: String, required: true },
-  // items: { type: [itemSchema], required: false }
   items: [{ type: Schema.Types.ObjectId, ref: 'Item' }]
 }, { timestamps: true, versionKey: false })
 
@@ -30,3 +39,4 @@ const movimientoSchema = new Schema({
 export const ItemModel = model('Item', ItemSchema)
 export const BodegaModel = model('bodega', bodegaSchema)
 export const MovimientoModel = model('movimiento', movimientoSchema)
+export const SimcardModel = model('simcard', SimcardSchema)

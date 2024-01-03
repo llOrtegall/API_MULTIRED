@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { createItem, getItems, createBodega, addItemToBodega, findBodegaWithItems, getBodegas, getMovimientos, moveItems, getBodegaSucursal, getMovimiento } from '../controllers/mongoDb.controller.js'
+import { createItem, getItems, createBodega, addItemToBodega, findBodegaWithItems, getBodegas, getMovimientos, moveItems, getBodegaSucursal, getMovimiento, createSimcard } from '../controllers/mongoDb.controller.js'
 
 export const mongoDB = Router()
 
@@ -22,3 +22,5 @@ mongoDB.get('/getMovimientos', getMovimientos)
 mongoDB.get('/movimiento/:id', getMovimiento)
 
 mongoDB.post('/moveItem', moveItems)
+
+mongoDB.post('/createSimcard', createSimcard)

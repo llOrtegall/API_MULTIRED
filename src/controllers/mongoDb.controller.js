@@ -1,4 +1,4 @@
-import { ItemModel, BodegaModel, MovimientoModel } from '../../Models/Models.js'
+import { ItemModel, BodegaModel, MovimientoModel, SimcardModel } from '../../Models/Models.js'
 import { ConnetMongoDB } from '../connections/mongoDb.js'
 import moment from 'moment-timezone'
 
@@ -36,6 +36,35 @@ export const createItem = async (req, res) => {
   }
 }
 
+export const createSimcard = async (req, res) => {
+  try {
+    const { numero, operador, estado, serial, apn, user, pass } = req.body
+
+    // Validar los datos de entrada
+    if (!numero || !operador || !estado || !serial || !apn) {
+      return res.status(400).json({ error: 'Faltan campos requeridos' })
+    }
+
+    await ConnetMongoDB()
+
+    const newSimcard = new SimcardModel({ numero, operador, estado, serial, apn, user, pass })
+    await newSimcard.save()
+    res.status(201).json({ message: 'Simcard creada correctamente' })
+  } catch (error) {
+    console.log(error)
+
+    if (error.code === 11000) {
+      console.log(error)
+      const Code = error.code
+      const name = Object.keys(error.keyValue)[0]
+      const Value = error.keyValue[Object.keys(error.keyValue)[0]]
+      return res.status(400)
+        .json({ error: `Error: ${Code}, ${name} = ${Value} Ya Existe !!! ` })
+    }
+
+    res.status(500).json({ error: 'Error al crear la simcard' })
+  }
+}
 export const getItems = async (req, res) => {
   try {
     await ConnetMongoDB()
