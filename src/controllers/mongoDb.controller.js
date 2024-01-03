@@ -186,8 +186,11 @@ export const moveItems = async (req, res) => {
       targetBodega.items.push(item)
     }
 
+    const movimientoId = await MovimientoModel.countDocuments() + 1
+
     // Crea el movimiento
     const movimiento = new MovimientoModel({
+      movimientoId,
       encargado,
       incidente,
       descripcion,

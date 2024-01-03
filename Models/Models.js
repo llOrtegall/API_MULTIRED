@@ -1,7 +1,4 @@
-import AutoIncrementFactory from 'mongoose-sequence'
-import mongoose, { Schema, model } from 'mongoose'
-
-const AutoIncrement = AutoIncrementFactory(mongoose)
+import { Schema, model } from 'mongoose'
 
 const ItemSchema = new Schema({
   nombre: { type: String, required: true },
@@ -29,8 +26,6 @@ const movimientoSchema = new Schema({
   bodegaOrigen: { type: Schema.Types.ObjectId, ref: 'bodega' },
   bodegaDestino: { type: Schema.Types.ObjectId, ref: 'bodega' }
 }, { timestamps: true, versionKey: false })
-
-movimientoSchema.plugin(AutoIncrement, { inc_field: 'movimientoId' })
 
 export const ItemModel = model('Item', ItemSchema)
 export const BodegaModel = model('bodega', bodegaSchema)
