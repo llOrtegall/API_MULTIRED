@@ -1,7 +1,6 @@
-import { resportEmail, consultaTable } from '../services/funtionsReutilizables.js'
+import { resportEmail, consultaTable } from '../utils/funtionsReutilizables.js'
 import { getPoolChatBot } from '../connections/mysqlDBChatBot.js'
-import { validateUser } from '../../schemas/userSchema.js'
-import { logger } from '../services/logsApp.js'
+import { validateUser } from '../schemas/userSchema.js'
 
 // TODO: trae los clientes registrados en x chatBoot
 
@@ -20,7 +19,6 @@ export const getClientes = async (req, res) => {
     const [result] = await pool.query(`SELECT * FROM ${consultaTable(company)}`)
     res.status(200).json(result)
   } catch (error) {
-    logger.error('Error al obtener los clientes', error)
     res.status(500).json({ message: 'Error al obtener los clientes' })
   }
 }
@@ -49,7 +47,6 @@ export const updateCliente = async (req, res) => {
       res.status(404).json({ message: 'Cliente no encontrado' })
     }
   } catch (error) {
-    logger.error('Error al actualizar el cliente', error)
     res.status(500).json({ message: 'Error al actualizar el cliente' })
   }
 }
@@ -65,7 +62,6 @@ export const reportCliente = async (req, res) => {
     await resportEmail({ data })
     res.status(200).json({ message: 'Solicitud Enviada' })
   } catch (error) {
-    logger.error('Error al enviar el reporte del cliente', error)
     res.status(500).json({ message: 'Error al enviar el reporte del cliente' })
   }
 }

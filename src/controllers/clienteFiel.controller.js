@@ -1,7 +1,6 @@
-import { obtenerFechaActual, sendEmail, sendEmailServired, separarNombre } from '../services/funtionsReutilizables.js'
-import { validateClientUser } from '../../schemas/userSchema.js'
+import { obtenerFechaActual, sendEmail, sendEmailServired, separarNombre } from '../utils/funtionsReutilizables.js'
+import { validateClientUser } from '../schemas/userSchema.js'
 import { conectOraDB } from '../connections/oracleDB.js'
-import { logger } from '../services/logsApp.js'
 
 export const getClientFiel = async (req, res) => {
   const { ccs } = req.body
@@ -17,7 +16,6 @@ export const getClientFiel = async (req, res) => {
     const results = await Promise.all(promises)
     res.status(200).json(results)
   } catch (error) {
-    logger.error('Error al ejecutar la consulta', error)
     res.status(500).json({ message: 'Error al obtener los clientes' })
   } finally {
     await connection.close()
@@ -57,7 +55,6 @@ export const createdClientFiel = async (req, res) => {
       }
     } catch (error) {
       await connection.rollback() // Deshacer los cambios en caso de error
-      logger.error('Ocurrió un error al crear el usuario: ', error)
       return res.status(500).json({ message: 'Ocurrió un error al crear el usuario, consulte con el admin' })
     } finally {
       await connection.close()
@@ -79,7 +76,6 @@ export const createdClientFiel = async (req, res) => {
       }
     } catch (error) {
       await connection.rollback() // Deshacer los cambios en caso de error
-      logger.error('Ocurrió un error al crear el usuario: ', error)
       return res.status(500).json({ message: 'Ocurrió un error al crear el usuario, consulte con el admin' })
     } finally {
       await connection.close()
