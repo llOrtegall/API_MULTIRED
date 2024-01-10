@@ -1,11 +1,11 @@
 import { Router } from 'express'
-import { getUser, createUser, getLogin, changePassword, getUsers, forgotPassword, ResetPassword } from '../controllers/users.controllers.js'
+import { getUserByToken, createUser, getLogin, changePassword, getUsers, forgotPassword, ResetPassword } from '../controllers/users.controllers.js'
 
 export const LoginUser = Router()
 
 LoginUser.post('/login', getLogin)
 
-LoginUser.get('/profile', getUser)
+LoginUser.get('/profile', getUserByToken)
 
 LoginUser.post('/register', createUser)
 
