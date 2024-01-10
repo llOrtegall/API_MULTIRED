@@ -5,6 +5,9 @@ import { htmlCreatedUser, htmlCreatedUserServired, forgotPasswordEmail } from '.
 
 dotenv.config()
 
+export const generatePassword = (documento) => `CP${documento.toString().slice(-3)}`
+export const generateUsername = (documento) => `CP${documento.toString()}`
+
 export function consultaTable (select) {
   if (select === 'Multired') {
     return 'personayumbo'
