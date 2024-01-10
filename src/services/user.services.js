@@ -21,18 +21,24 @@ export const getUsersService = async () => {
   return response
 }
 
-export const getLoginService = async (user, password) => {
+export const getLoginService = async (data) => {
+  const { user, password } = data
+  // TODO: Primero valida que lleguen los datos requeridos
+  if (!user || !password) {
+    throw new Error('El Usuario / Contraseña Son Requeridos')
+  }
+
   const pool = await getPoolLogin()
   const [result] = await pool.query('SELECT *, BIN_TO_UUID(id) FROM login_chat WHERE username = ?', [user])
   if (result.length === 0) {
-    return { error: `El Usuario ${user} No Se Encuentra Registrado` }
+    throw new Error(`El Usuario ${user} No Se Encuentra Registrado`)
   }
   const passwordMatches = await bcrypt.compare(password, result[0].password)
   if (!passwordMatches) {
-    return { error: 'Contraseña Incorrecta !!!' }
+    throw new Error('Contraseña Incorrecta !!!')
   }
   if (result[0].estado === 0) {
-    return { error: 'Usuario Se Ecuentra Inactivo' }
+    throw new Error('Usuario Se Ecuentra Inactivo')
   }
   delete result[0].id; delete result[0].password; delete result[0].password2; delete result[0].estado
   const { 'BIN_TO_UUID(id)': id, ...rest } = result[0]

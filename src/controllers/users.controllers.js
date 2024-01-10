@@ -11,7 +11,7 @@ export const getUsers = async (req, res) => {
     return res.status(200).json(users)
   } catch (error) {
     console.error(error)
-    return res.status(500).json({ error: error.message })
+    return res.status(500).json(error.message)
   }
 }
 
@@ -31,17 +31,11 @@ export const getUserByToken = async (req, res) => {
 }
 
 export const getLogin = async (req, res) => {
-  const { user, password } = req.body
-  // TODO: Primero valida que lleguen los datos requeridos
-  if (!user || !password) {
-    return res.status(400).json({ error: 'El Usuario / Contraseña Son Requeridos' })
-  }
-  // TODO: solicita al servicio que valide las credenciales y retorne el token
   try {
-    const result = await getLoginService(user, password)
+    const result = await getLoginService(req.body)
     return res.status(200).json(result)
   } catch (error) {
-    return res.status(500).json({ error })
+    return res.status(500).json({ error: error.message })
   }
 }
 
