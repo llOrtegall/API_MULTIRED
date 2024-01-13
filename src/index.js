@@ -8,6 +8,7 @@ import cookieParser from 'cookie-parser'
 import express from 'express'
 import morgan from 'morgan'
 import cors from 'cors'
+import { validateEnvVariables } from './utils/Validacion.js'
 
 const ACCEPTED_ORIGINS = [
   'http://172.20.1.160',
@@ -37,6 +38,8 @@ app.use(ClienteFiel)
 
 // TODO: Metodos En Chat Boot DB
 app.use(ChatBoot)
+
+validateEnvVariables()
 
 app.listen(PORT, () => {
   console.log(`Server Iniciado En El Puerto http://localhost:${PORT}`)

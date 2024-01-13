@@ -10,8 +10,7 @@ export const getUsers = async (req, res) => {
     const users = await getUsersService()
     return res.status(200).json(users)
   } catch (error) {
-    console.error(error)
-    return res.status(500).json(error.message)
+    return res.status(500).json(error)
   }
 }
 
@@ -35,7 +34,7 @@ export const getLogin = async (req, res) => {
     const result = await getLoginService(req.body)
     return res.status(200).json(result)
   } catch (error) {
-    return res.status(500).json({ error: error.message })
+    return res.status(500).json(error)
   }
 }
 
@@ -51,7 +50,7 @@ export const createUser = async (req, res) => {
     const response = await registerUserService({ data: result })
     return res.status(200).json(response)
   } catch (error) {
-    return res.status(500).json({ error: error.message })
+    return res.status(500).json(error)
   }
 }
 
@@ -60,7 +59,7 @@ export const changePassword = async (req, res) => {
     const response = await changePasswordService(req.body)
     return res.status(200).json(response)
   } catch (error) {
-    return res.status(400).json({ error: error.message })
+    return res.status(500).json(error)
   }
 }
 
@@ -69,7 +68,7 @@ export const forgotPassword = async (req, res) => {
     const response = await forgotPasswordService(req.body)
     return res.status(200).json(response)
   } catch (error) {
-    return res.status(400).json({ error: error.message })
+    return res.status(500).json(error)
   }
 }
 
@@ -78,6 +77,6 @@ export const ResetPassword = async (req, res) => {
     const response = await ResetPasswordService(req.body)
     return res.status(200).json(response)
   } catch (error) {
-    return res.status(400).json({ error: error.message })
+    return res.status(500).json(error)
   }
 }
