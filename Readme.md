@@ -22,12 +22,12 @@ La presente documentación establece los pasos para inicializar la API.
 
   - Establecer Varibles De Entorno de DB Oracle:
 
-    # Variables De Cliente Fiel DataBase OracleDB
+    # Variables De Cliente Fiel Base De Datos Oracle
       USER_NAME=''
       PASS_WORD=''
       CONECT_STRING=''
 
---- # Configuración Login y ChatBoot
+  - Configuración Login y ChatBoot
 
   - Se debe establecer en las variables de entorno las bases de Datos necesarias para acceder al Schema del login y registros ChatBot
 
@@ -48,8 +48,10 @@ La presente documentación establece los pasos para inicializar la API.
         DATABASE=''
 
  ---
-  # Establecer variables para llave Secreta Tokens y Envio de Correos;
 
+  - Configuración Secret Key Y Correos
+
+  # Variables llave Secreta Tokens y Envio de Correos
   --> Este mediante la variables:
 
       * llave Secreta Es Buena practica Cambiarla de vez en cuando
