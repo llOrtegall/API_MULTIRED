@@ -1,6 +1,5 @@
 import { createPool } from 'mysql2/promise'
 
-// Creando la conexión ChatBot
 export const getPoolChatBot = async () => {
   let pool
   try {

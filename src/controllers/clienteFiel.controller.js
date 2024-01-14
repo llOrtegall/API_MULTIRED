@@ -71,11 +71,11 @@ export const createdClientFiel = async (req, res) => {
       await connection.commit()
       if (result.rowsAffected === 1) {
         const userCreado = { nombre, cedula, telefono, correo }
-        sendEmailServired({ userCreado }) // Envío De Correo Al Cliente
+        sendEmailServired({ userCreado }) /* Envío De Correo Al Cliente */
         res.status(201).json({ success: true, message: 'Usuario creado exitosamente' })
       }
     } catch (error) {
-      await connection.rollback() // Deshacer los cambios en caso de error
+      await connection.rollback() /* Deshacer los cambios en caso de error */
       return res.status(500).json({ message: 'Ocurrió un error al crear el usuario, consulte con el admin' })
     } finally {
       await connection.close()
