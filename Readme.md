@@ -48,29 +48,33 @@ La presente documentación establece los pasos para inicializar la API.
         DATABASE=''
 
  ---
-  * Establecer variables para llave Secreta Tokens y Envio de Correos;
+  # Establecer variables para llave Secreta Tokens y Envio de Correos;
 
-    # llave Secreta Es Buena practica Cambiarla de vez en cuando
-      JWT_SECRET=''
+  --> Este mediante la variables:
 
-    # El servicio de email se realiza mediante una libreria gratutia se deben colocar correo y contraseña de gmail
-      EMAIL_USER=''
-      EMAIL_PASS=''
+      * llave Secreta Es Buena practica Cambiarla de vez en cuando
+        JWT_SECRET=''
 
-    # Envio De Reportes
-      EMAIL_SEND_REPORTS=''
+      * El servicio de email se realiza mediante una libreria gratutia se deben colocar correo y contraseña de gmail
+        EMAIL_USER=''
+        EMAIL_PASS=''
 
---------
-Definidas las variables de entorno
+      * Envio De Reportes
+        EMAIL_SEND_REPORTS=''
 
-1 -> Instalar Dependencias ya se npm yarn o pnpm
+---
+# Definidas las variables de entorno
+
+# 1 --> Instalar Dependencias ya se npm yarn o pnpm
   Example desde consola : yarn - npm install 
         yarn install v1.22.21
         [1/4] Resolving packages...
         success Already up-to-date.
         Done in 0.22s.
 
-2 -> Iniciarlizar API en package punto Json el Script apunta al archivo principal
+# 2 -> Iniciarlizar API en package punto Json el Script apunta al archivo principal
+
+
       "scripts": {
         "start": "node ./src/index.js",
       },
