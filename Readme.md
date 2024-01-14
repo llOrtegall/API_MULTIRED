@@ -22,7 +22,7 @@ La presente documentación establece los pasos para inicializar la API.
 
   - Establecer Varibles De Entorno de DB Oracle:
 
-    # TODO: Variables De Cliente Fiel DataBase OracleDB
+    # Variables De Cliente Fiel DataBase OracleDB
       USER_NAME=''
       PASS_WORD=''
       CONECT_STRING=''
@@ -33,14 +33,14 @@ La presente documentación establece los pasos para inicializar la API.
 
   --> Este mediante la variables:
 
-        # TODO: Credenciales De DataBase Chat Boot MySQL
+        # Credenciales De DataBase Chat Boot MySQL
         HOSTMYSQL=''
         USUARIO=''
         PASSWORD=''
         PUERTO=''
         NAME_DATABASE=''
 
-        # TODO: login
+        # login
         MYSQLLOGIN=''
         USR=''
         PASS=''
@@ -50,12 +50,12 @@ La presente documentación establece los pasos para inicializar la API.
  ---
   * Establecer variables para llave Secreta Tokens y Envio de Correos;
 
-    # TODO: llave Secreta Es Buena practica Cambiarla de vez en cuando
+    # llave Secreta Es Buena practica Cambiarla de vez en cuando
       JWT_SECRET=''
 
-    # TODO: El servicio de email se realiza mediante una libreria gratutia se deben colocar correo y contraseña de gmail
-      EMAIL_USER='aplicacionesmultired@gmail.com'
-      EMAIL_PASS='jzsbuymmcpblqwlw'
+    # El servicio de email se realiza mediante una libreria gratutia se deben colocar correo y contraseña de gmail
+      EMAIL_USER=''
+      EMAIL_PASS=''
 
     # Envio De Reportes
       EMAIL_SEND_REPORTS=''
