@@ -27,7 +27,6 @@ export const getLoginService = async (data) => {
   if (!user || !password) {
     throw new Error('El Usuario / Contraseña Son Requeridos')
   }
-
   const pool = await getPoolLogin()
   const [result] = await pool.query('SELECT *, BIN_TO_UUID(id) FROM login_chat WHERE username = ?', [user])
   if (result.length === 0) {

@@ -1,6 +1,6 @@
 {
   "name": "api-rest-multired",
-  "version": "1.1.0",
+  "version": "1.0.1",
   "description": "Api Creada para el proyecto de Multired",
   "main": "index.js",
   "type": "module",
