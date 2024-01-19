@@ -1,6 +1,6 @@
 import { ValidarUsuario } from '../schemas/userSchema.js'
 
-import { getUsersService, getLoginService, registerUserService, changePasswordService, forgotPasswordService, ResetPasswordService } from '../services/user.services.js'
+import { getUsersService, LoginService, registerUserService, changePasswordService, forgotPasswordService, ResetPasswordService } from '../services/user.services.js'
 
 import jwt from 'jsonwebtoken'
 const JWT_SECRET = process.env.JWT_SECRET
@@ -14,7 +14,7 @@ export const getUsers = async (req, res) => {
   }
 }
 
-export const getUserByToken = async (req, res) => {
+export const UserByToken = async (req, res) => {
   const token = req.headers.authorization?.split(' ')[1]
 
   if (token !== 'null' && token !== undefined) {
@@ -29,12 +29,13 @@ export const getUserByToken = async (req, res) => {
   }
 }
 
-export const getLogin = async (req, res) => {
+export const Login = async (req, res) => {
   try {
-    const result = await getLoginService(req.body)
+    const result = await LoginService(req.body)
     return res.status(200).json(result)
   } catch (error) {
-    return res.status(500).json(error)
+    console.log(error)
+    return res.status(500).json({ message: error.message })
   }
 }
 

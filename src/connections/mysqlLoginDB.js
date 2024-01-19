@@ -7,6 +7,7 @@ export const getPoolLogin = async () => {
       host: process.env.MYSQLLOGIN,
       user: process.env.USR,
       port: process.env.PORT,
+      password: process.env.PASS,
       database: process.env.DATABASE,
       waitForConnections: false,
       connectionLimit: 3,

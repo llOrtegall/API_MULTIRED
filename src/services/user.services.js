@@ -21,9 +21,9 @@ export const getUsersService = async () => {
   return response
 }
 
-export const getLoginService = async (data) => {
+export const LoginService = async (data) => {
   const { user, password } = data
-  // TODO: Primero valida que lleguen los datos requeridos
+
   if (!user || !password) {
     throw new Error('El Usuario / Contraseña Son Requeridos')
   }
