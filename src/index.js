@@ -1,5 +1,12 @@
 import 'dotenv/config.js'
 
+import { validateEnvVariables } from './utils/Validacion.js'
+
+import { MovimientosMongoDB } from './routes/Movimientos.Routes.js'
+import { SimcardsMongoDB } from './routes/Simcares.Routes.js'
+import { BodegasMongoDB } from './routes/Bodegas.Routes.js'
+import { ItemsMongoDB } from './routes/Items.Routes.js'
+
 import { ClienteFiel } from './routes/clienteFiel.routes.js'
 import { ChatBoot } from './routes/chatBoot.routes.js'
 import { LoginUser } from './routes/users.routes.js'
@@ -8,7 +15,6 @@ import cookieParser from 'cookie-parser'
 import express from 'express'
 import morgan from 'morgan'
 import cors from 'cors'
-import { validateEnvVariables } from './utils/Validacion.js'
 
 const ACCEPTED_ORIGINS = [
   'http://172.20.1.160',
@@ -38,6 +44,12 @@ app.use(ClienteFiel)
 
 // TODO: Metodos En Chat Boot DB
 app.use(ChatBoot)
+
+// TODO: Métodos Bodega MongoDB
+app.use(ItemsMongoDB)
+app.use(BodegasMongoDB)
+app.use(MovimientosMongoDB)
+app.use(SimcardsMongoDB)
 
 validateEnvVariables()
 
