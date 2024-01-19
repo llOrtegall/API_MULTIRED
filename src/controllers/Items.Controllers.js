@@ -1,5 +1,5 @@
 import { ItemModel } from '../Models/Models.js'
-import { ConnetMongoDB } from '../Connections/mongoDb.js'
+import { ConnetMongoDB } from '../Connections/MongoDb.js'
 
 export const getItems = async (req, res) => {
   try {

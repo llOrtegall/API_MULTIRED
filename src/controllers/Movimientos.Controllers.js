@@ -1,5 +1,5 @@
 import { BodegaModel, MovimientoModel } from '../Models/Models.js'
-import { ConnetMongoDB } from '../Connections/mongoDb.js'
+import { ConnetMongoDB } from '../Connections/MongoDb.js'
 import moment from 'moment-timezone'
 
 export const getMovimientos = async (req, res) => {

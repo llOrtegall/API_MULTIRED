@@ -1,6 +1,6 @@
-import { generatePassword, generateUsername, forgotPasswordSend } from '../utils/funtionsReutilizables.js'
-import { Company, Proceso, State } from '../utils/Definiciones.js'
-import { getPoolLogin } from '../connections/mysqlLoginDB.js'
+import { generatePassword, generateUsername, forgotPasswordSend } from '../Utils/funtionsReutilizables.js'
+import { Company, Proceso, State } from '../Utils/Definiciones.js'
+import { getPoolLogin } from '../Connections/MysqlLoginDB.js'
 
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'

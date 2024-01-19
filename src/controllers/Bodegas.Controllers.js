@@ -1,5 +1,5 @@
 import { BodegaModel, ItemModel } from '../Models/Models.js'
-import { ConnetMongoDB } from '../Connections/mongoDb.js'
+import { ConnetMongoDB } from '../Connections/MongoDb.js'
 
 export const createBodega = async (req, res) => {
   const { nombre, sucursal, direccion } = req.body

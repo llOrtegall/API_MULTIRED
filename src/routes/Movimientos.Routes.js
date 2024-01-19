@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { getMovimiento, getMovimientos, moveItems, moveSimcards } from '../controllers/Movimientos.Controller.js'
+import { getMovimiento, getMovimientos, moveItems, moveSimcards } from '../Controllers/Movimientos.Controllers.js'
 
 export const MovimientosMongoDB = Router()
 
