@@ -16,8 +16,8 @@ export const createItem = async (req, res) => {
   try {
     const { nombre, descripcion, placa, serial, estado } = req.body
 
-    if (!/^MI-|^MA-/.test(placa)) {
-      return res.status(400).json({ error: 'La placa debe comenzar con "MI-" o "MA-"' })
+    if (!/^MI-\d{1,5}$|^MA-\d{1,5}$/.test(placa)) {
+      return res.status(400).json({ error: 'La placa debe comenzar con "MI-" o "MA-" seguido de un número de hasta 5 dígitos' })
     }
 
     // Validar los datos de entrada
@@ -48,35 +48,31 @@ export const createItem = async (req, res) => {
 
 export const updateItem = async (req, res) => {
   try {
-    const { nombre, descripcion, placa, serial, estado } = req.body
-
-    if (!/^MI-|^MA-/.test(placa)) {
-      return res.status(400).json({ error: 'La placa debe comenzar con "MI-" o "MA-"' })
-    }
-
-    // Validar los datos de entrada
-    if (!nombre || !descripcion || !placa || !serial || !estado) {
-      return res.status(400).json({ error: 'Faltan campos requeridos' })
-    }
+    const { id, descripcion, estado, placa, serial } = req.body
 
     await ConnetMongoDB()
 
-    const newItem = new ItemModel({ nombre, descripcion, placa, serial, estado })
-    await newItem.save()
-    res.status(201).json({ message: 'Ítem creado correctamente' })
-  } catch (error) {
-    console.log(error)
+    if (!/^MI-\d{1,5}$|^MA-\d{1,5}$/.test(placa)) {
+      return res.status(400).json({ error: 'La placa debe comenzar con "MI-" o "MA-" seguido de un número de hasta 5 dígitos' })
+    }
 
+    const item = await ItemModel.findOneAndUpdate({ _id: id }, { descripcion, estado, placa, serial }, { new: true })
+
+    if (!item) {
+      return res.status(404).json({ error: 'Item no encontrado' })
+    }
+
+    return res.status(200).json({ message: 'Item actualizado correctamente' })
+  } catch (error) {
     if (error.code === 11000) {
       console.log(error)
-      const Code = error.code
       const name = Object.keys(error.keyValue)[0]
       const Value = error.keyValue[Object.keys(error.keyValue)[0]]
       return res.status(400)
-        .json({ error: `Error: ${Code}, ${name} = ${Value} Ya Existe !!! ` })
+        .json({ error: `${name} = ${Value} Ya Existe !!! ` })
     }
 
-    res.status(500).json({ error: 'Error al crear el ítem' })
+    return res.status(500).json({ error: 'Error al actualizar el item' })
   }
 }
 
