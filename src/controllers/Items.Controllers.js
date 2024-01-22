@@ -16,8 +16,8 @@ export const createItem = async (req, res) => {
   try {
     const { nombre, descripcion, placa, serial, estado } = req.body
 
-    if (!/^MI-|^MA-/.test(placa)) {
-      return res.status(400).json({ error: 'La placa debe comenzar con "MI-" o "MA-"' })
+    if (!/^MI-\d{1,5}$|^MA-\d{1,5}$/.test(placa)) {
+      return res.status(400).json({ error: 'La placa debe comenzar con "MI-" o "MA-" seguido de un número de hasta 5 dígitos' })
     }
 
     // Validar los datos de entrada
