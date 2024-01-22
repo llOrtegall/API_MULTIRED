@@ -7,6 +7,6 @@ ItemsMongoDB.post('/createItem', createItem)
 
 ItemsMongoDB.get('/getItems', getItems)
 
-ItemsMongoDB.put('/updateItem/:id', updateItem)
+ItemsMongoDB.patch('/updateItem', updateItem)
 
 ItemsMongoDB.delete('/deleteItem/:id', deleteItem)
