@@ -50,9 +50,20 @@ export const getBodegasSim = async (req, res) => {
 
 export const getBodegaSucursal = async (req, res) => {
   const { sucursal } = req.params
+  if (isNaN(sucursal)) {
+    res.status(400).json({ error: 'La sucursal debe ser un número' })
+    return
+  }
+
   try {
     await ConnetMongoDB()
     const bodega = await BodegaModel.findOne({ sucursal }).populate('items')
+
+    if (!bodega) {
+      res.status(404).json({ error: 'No se encontró la bodega con la sucursal proporcionada' })
+      return
+    }
+
     res.status(200).json(bodega)
   } catch (error) {
     console.error(error)
