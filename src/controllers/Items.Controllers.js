@@ -6,7 +6,7 @@ export const getItems = async (req, res) => {
     return res.status(200).json(items)
   } catch (error) {
     console.error(error)
-    res.status(500).send('Error al obtener los items')
+    return res.status(500).send('Error al obtener los items')
   }
 }
 
@@ -28,7 +28,7 @@ export const createItem = async (req, res) => {
 
     const newItem = new ItemModel({ nombre, descripcion, placa, serial, estado })
     await newItem.save()
-    res.status(201).json({ message: 'Ítem creado correctamente' })
+    return res.status(201).json({ message: 'Ítem creado correctamente' })
   } catch (error) {
     console.log(error)
 
@@ -39,7 +39,7 @@ export const createItem = async (req, res) => {
       return res.status(400).json({ error: `Error: ${Code}, ${name} = ${Value} Ya Existe !!! ` })
     }
 
-    res.status(500).json({ error: error.message || 'Error al crear el ítem' })
+    return res.status(500).json({ error: error.message || 'Error al crear el ítem' })
   }
 }
 
@@ -65,7 +65,7 @@ export const updateItem = async (req, res) => {
       throw new Error('Item no encontrado')
     }
 
-    res.status(200).json({ message: 'Item actualizado correctamente' })
+    return res.status(200).json({ message: 'Item actualizado correctamente' })
   } catch (error) {
     console.log(error)
 
@@ -76,7 +76,7 @@ export const updateItem = async (req, res) => {
       return res.status(400).json({ error: `Error: ${Code}, ${name} = ${Value} Ya Existe !!! ` })
     }
 
-    res.status(500).json({ error: error.message || 'Error al actualizar el ítem' })
+    return res.status(500).json({ error: error.message || 'Error al actualizar el ítem' })
   }
 }
 
@@ -95,9 +95,9 @@ export const deleteItem = async (req, res) => {
       throw new Error('Ítem no encontrado')
     }
 
-    res.status(200).json({ message: 'Ítem eliminado correctamente' })
+    return res.status(200).json({ message: 'Ítem eliminado correctamente' })
   } catch (error) {
     console.log(error)
-    res.status(500).json({ error: error.message || 'Error al eliminar el ítem' })
+    return res.status(500).json({ error: error.message || 'Error al eliminar el ítem' })
   }
 }

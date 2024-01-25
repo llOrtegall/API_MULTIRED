@@ -1,7 +1,7 @@
 import { BodegaModel, ItemModel } from '../Models/Models.js'
 
 export const createBodega = async (req, res) => {
-  const { nombre, sucursal, direccion } = req.body
+  const { nombre, sucursal, direccion, company } = req.body
   try {
     // Validar los datos de entrada
     if (!nombre || !sucursal || !direccion) {
@@ -10,7 +10,7 @@ export const createBodega = async (req, res) => {
 
     const newBodega = new BodegaModel({ nombre, sucursal, direccion })
     await newBodega.save()
-    res.status(201).json({ message: 'Bodega creada correctamente' })
+    res.status(201).json({ message: `Bodega Creada Correctamente en ${company}` })
   } catch (error) {
     if (error.code === 11000) {
       const Code = error.code
@@ -26,10 +26,10 @@ export const createBodega = async (req, res) => {
 export const getBodegas = async (req, res) => {
   try {
     const bodegas = await BodegaModel.find()
-    res.status(200).json(bodegas)
+    return res.status(200).json(bodegas)
   } catch (error) {
     console.error(error)
-    res.status(500).json({ error: 'Error al obtener las bodegas' })
+    return res.status(500).json({ error: 'Error al obtener las bodegas' })
   }
 }
 
@@ -56,10 +56,10 @@ export const getBodegaSucursalSimcards = async (req, res) => {
   const { sucursal } = req.params
   try {
     const bodega = await BodegaModel.findOne({ sucursal }).populate('simcards')
-    res.status(200).json(bodega)
+    return res.status(200).json(bodega)
   } catch (error) {
     console.error(error)
-    res.status(500).json({ error: 'Error al obtener la bodega' })
+    return res.status(500).json({ error: 'Error al obtener la bodega' })
   }
 }
 
@@ -80,10 +80,10 @@ export const findBodegaWithItems = async (req, res) => {
       bodega: bodegasMap[item._id.toString()] || 'No Asignado'
     }))
 
-    res.status(200).json(itemsWithBodegas)
+    return res.status(200).json(itemsWithBodegas)
   } catch (error) {
     console.error(error)
-    res.status(500).json({ error: 'Error al obtener los ítems y las bodegas' })
+    return res.status(500).json({ error: 'Error al obtener los ítems y las bodegas' })
   }
 }
 
@@ -120,7 +120,7 @@ export const addItemToBodega = async (req, res) => {
     }
 
     await bodega.save()
-    res.status(200).json({ message: `Ítems agregados correctamente a Bodega: ${sucursal}` })
+    return res.status(200).json({ message: `Ítems agregados correctamente a Bodega: ${sucursal}` })
   } catch (error) {
     return res.status(500).json({ error: 'Error al agregar los ítems a bodega', message: error })
   }
@@ -129,10 +129,10 @@ export const addItemToBodega = async (req, res) => {
 export const getBodegasSim = async (req, res) => {
   try {
     const bodegas = await BodegaModel.find().populate('simcards')
-    res.status(200).json(bodegas)
+    return res.status(200).json(bodegas)
   } catch (error) {
     console.error(error)
-    res.status(500).json({ error: 'Error al obtener las bodegas' })
+    return res.status(500).json({ error: 'Error al obtener las bodegas' })
   }
 }
 
@@ -140,9 +140,9 @@ export const getBodegaSucursalItemsSimcards = async (req, res) => {
   const { id } = req.params
   try {
     const bodega = await BodegaModel.findById(id).populate('items').populate('simcards')
-    res.status(200).json(bodega)
+    return res.status(200).json(bodega)
   } catch (error) {
     console.error(error)
-    res.status(500).json({ error: 'Error al obtener la bodega' })
+    return res.status(500).json({ error: 'Error al obtener la bodega' })
   }
 }

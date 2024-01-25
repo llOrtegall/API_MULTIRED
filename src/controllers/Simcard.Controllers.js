@@ -17,7 +17,7 @@ export const createSimcard = async (req, res) => {
   try {
     const simcard = new SimcardModel({ numero, operador, estado, serial, apn, user, pass })
     await simcard.save()
-    res.status(201).json(simcard)
+    return res.status(201).json(simcard)
   } catch (error) {
     console.error(error)
     if (error.code === 11000) {
@@ -25,7 +25,7 @@ export const createSimcard = async (req, res) => {
       const value = error.keyValue[field]
       return res.status(400).json({ error: `El Campo: ${field} con el Valor: ${value} ya existe` })
     }
-    res.status(500).json({ error: 'Error al crear la simcard' })
+    return res.status(500).json({ error: 'Error al crear la simcard' })
   }
 }
 
@@ -46,10 +46,10 @@ export const getSimcardWhitBodega = async (req, res) => {
       bodega: bodegasMap[item._id.toString()] || 'No Asignado'
     }))
 
-    res.status(200).json(itemsWithBodegas)
+    return res.status(200).json(itemsWithBodegas)
   } catch (error) {
     console.error(error)
-    res.status(500).json({ error: 'Error al obtener los ítems y las bodegas' })
+    return res.status(500).json({ error: 'Error al obtener los ítems y las bodegas' })
   }
 }
 
@@ -80,7 +80,7 @@ export const addSimcardToBodega = async (req, res) => {
     bodega.simcards.push(...simcards.map(simcard => simcard._id))
     await bodega.save()
 
-    res.status(200).json({ message: `Simcard(s) agregadas correctamente a Bodega: ${sucursal}` })
+    return res.status(200).json({ message: `Simcard(s) agregadas correctamente a Bodega: ${sucursal}` })
   } catch (error) {
     console.error(error)
     return res.status(500).json({ error: 'Error al agregar los ítems a bodega', message: error })
