@@ -1,5 +1,4 @@
 import { BodegaModel, ItemModel } from '../Models/Models.js'
-import { ConnetMongoDB } from '../Connections/MongoDb.js'
 
 export const createBodega = async (req, res) => {
   const { nombre, sucursal, direccion } = req.body
@@ -8,8 +7,6 @@ export const createBodega = async (req, res) => {
     if (!nombre || !sucursal || !direccion) {
       return res.status(400).json({ error: 'Faltan campos requeridos' })
     }
-
-    await ConnetMongoDB()
 
     const newBodega = new BodegaModel({ nombre, sucursal, direccion })
     await newBodega.save()
@@ -28,19 +25,7 @@ export const createBodega = async (req, res) => {
 
 export const getBodegas = async (req, res) => {
   try {
-    await ConnetMongoDB()
     const bodegas = await BodegaModel.find()
-    res.status(200).json(bodegas)
-  } catch (error) {
-    console.error(error)
-    res.status(500).json({ error: 'Error al obtener las bodegas' })
-  }
-}
-
-export const getBodegasSim = async (req, res) => {
-  try {
-    await ConnetMongoDB()
-    const bodegas = await BodegaModel.find().populate('simcards')
     res.status(200).json(bodegas)
   } catch (error) {
     console.error(error)
@@ -54,16 +39,12 @@ export const getBodegaSucursal = async (req, res) => {
     res.status(400).json({ error: 'La sucursal debe ser un número' })
     return
   }
-
   try {
-    await ConnetMongoDB()
     const bodega = await BodegaModel.findOne({ sucursal }).populate('items')
-
     if (!bodega) {
       res.status(404).json({ error: 'No se encontró la bodega con la sucursal proporcionada' })
       return
     }
-
     res.status(200).json(bodega)
   } catch (error) {
     console.error(error)
@@ -74,7 +55,6 @@ export const getBodegaSucursal = async (req, res) => {
 export const getBodegaSucursalSimcards = async (req, res) => {
   const { sucursal } = req.params
   try {
-    await ConnetMongoDB()
     const bodega = await BodegaModel.findOne({ sucursal }).populate('simcards')
     res.status(200).json(bodega)
   } catch (error) {
@@ -85,8 +65,6 @@ export const getBodegaSucursalSimcards = async (req, res) => {
 
 export const findBodegaWithItems = async (req, res) => {
   try {
-    await ConnetMongoDB()
-
     const items = await ItemModel.find()
     const bodegas = await BodegaModel.find().populate('items')
 
@@ -118,8 +96,6 @@ export const addItemToBodega = async (req, res) => {
   }
 
   try {
-    await ConnetMongoDB()
-
     const bodega = await BodegaModel.findOne({ sucursal })
     if (!bodega) {
       res.status(404).json({ error: 'No se encontró la bodega con la sucursal proporcionada' })
@@ -150,10 +126,19 @@ export const addItemToBodega = async (req, res) => {
   }
 }
 
+export const getBodegasSim = async (req, res) => {
+  try {
+    const bodegas = await BodegaModel.find().populate('simcards')
+    res.status(200).json(bodegas)
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ error: 'Error al obtener las bodegas' })
+  }
+}
+
 export const getBodegaSucursalItemsSimcards = async (req, res) => {
   const { id } = req.params
   try {
-    await ConnetMongoDB()
     const bodega = await BodegaModel.findById(id).populate('items').populate('simcards')
     res.status(200).json(bodega)
   } catch (error) {
