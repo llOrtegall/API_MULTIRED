@@ -1,12 +1,13 @@
 import { Router } from 'express'
-import { createItem, getItems, deleteItem, updateItem } from '../Controllers/Items.Controllers.js'
+import { setDatabaseConnection } from '../middleware/setDatabase.js'
+import { createItem, getItems, deleteItem, updateItem } from '../controllers/Items.Controllers.js'
 
 export const ItemsMongoDB = Router()
 
-ItemsMongoDB.post('/createItem', createItem)
+ItemsMongoDB.post('/createItem', setDatabaseConnection, createItem)
 
-ItemsMongoDB.get('/getItems', getItems)
+ItemsMongoDB.get('/getItems/:company', setDatabaseConnection, getItems)
 
-ItemsMongoDB.patch('/updateItem', updateItem)
+ItemsMongoDB.patch('/updateItem', setDatabaseConnection, updateItem)
 
-ItemsMongoDB.delete('/deleteItem/:id', deleteItem)
+ItemsMongoDB.delete('/deleteItem/:company/:id', setDatabaseConnection, deleteItem)

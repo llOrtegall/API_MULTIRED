@@ -1,12 +1,11 @@
+import { createSimcard, getSimcardWhitBodega, addSimcardToBodega } from '../Controllers/Simcard.Controllers.js'
+import { setDatabaseConnection } from '../middleware/setDatabase.js'
 import { Router } from 'express'
-import { createSimcard, getSimcard, getSimcardWhitBodega, addSimcardToBodega } from '../Controllers/Simcard.Controllers.js'
 
 export const SimcardsMongoDB = Router()
 
-SimcardsMongoDB.get('/simcard/:id', getSimcard)
+SimcardsMongoDB.post('/createSimcard', setDatabaseConnection, createSimcard)
 
-SimcardsMongoDB.post('/createSimcard', createSimcard)
+SimcardsMongoDB.get('/simcardWhitBodega/:company', setDatabaseConnection, getSimcardWhitBodega)
 
-SimcardsMongoDB.get('/simcardWhitBodega', getSimcardWhitBodega)
-
-SimcardsMongoDB.post('/addSimcardToBodega', addSimcardToBodega)
+SimcardsMongoDB.post('/addSimcardToBodega', setDatabaseConnection, addSimcardToBodega)

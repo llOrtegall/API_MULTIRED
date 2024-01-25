@@ -1,20 +1,21 @@
 import { Router } from 'express'
 import { createBodega, getBodegaSucursal, getBodegas, findBodegaWithItems, addItemToBodega, getBodegasSim, getBodegaSucursalItemsSimcards, getBodegaSucursalSimcards } from '../Controllers/Bodegas.Controllers.js'
+import { setDatabaseConnection } from '../middleware/setDatabase.js'
 
 export const BodegasMongoDB = Router()
 
-BodegasMongoDB.post('/createBodega', createBodega)
+BodegasMongoDB.post('/createBodega', setDatabaseConnection, createBodega)
 
-BodegasMongoDB.get('/getBodegas', getBodegas)
+BodegasMongoDB.get('/getBodegas/:company', setDatabaseConnection, getBodegas)
 
-BodegasMongoDB.get('/getBodega/:sucursal', getBodegaSucursal)
+BodegasMongoDB.get('/getBodega/:company/:sucursal', setDatabaseConnection, getBodegaSucursal)
 
-BodegasMongoDB.get('/getBodegaSimcards/:sucursal', getBodegaSucursalSimcards)
+BodegasMongoDB.get('/getBodegaSimcards/:company/:sucursal', setDatabaseConnection, getBodegaSucursalSimcards)
 
-BodegasMongoDB.get('/itemsConBodegas', findBodegaWithItems)
+BodegasMongoDB.get('/itemsConBodegas/:company', setDatabaseConnection, findBodegaWithItems)
 
-BodegasMongoDB.post('/addItemsToBodega', addItemToBodega)
+BodegasMongoDB.post('/addItemsToBodega', setDatabaseConnection, addItemToBodega)
 
-BodegasMongoDB.get('/getBodegasSim', getBodegasSim)
+BodegasMongoDB.get('/getBodegasSim/:company', setDatabaseConnection, getBodegasSim)
 
-BodegasMongoDB.get('/getBodegasItemsSims/:id', getBodegaSucursalItemsSimcards)
+BodegasMongoDB.get('/getBodegasItemsSims/:company/:id', setDatabaseConnection, getBodegaSucursalItemsSimcards)

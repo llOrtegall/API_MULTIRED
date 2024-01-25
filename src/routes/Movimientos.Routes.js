@@ -1,12 +1,13 @@
-import { Router } from 'express'
 import { getMovimiento, getMovimientos, moveItems, moveSimcards } from '../Controllers/Movimientos.Controllers.js'
+import { setDatabaseConnection } from '../middleware/setDatabase.js'
+import { Router } from 'express'
 
 export const MovimientosMongoDB = Router()
 
-MovimientosMongoDB.get('/getMovimientos', getMovimientos)
+MovimientosMongoDB.get('/getMovimientos/:company', setDatabaseConnection, getMovimientos)
 
-MovimientosMongoDB.get('/movimiento/:id', getMovimiento)
+MovimientosMongoDB.get('/movimiento/:company/:id', setDatabaseConnection, getMovimiento)
 
-MovimientosMongoDB.post('/moveItem', moveItems)
+MovimientosMongoDB.post('/moveItem', setDatabaseConnection, moveItems)
 
-MovimientosMongoDB.post('/moveSimcard', moveSimcards)
+MovimientosMongoDB.post('/moveSimcard', setDatabaseConnection, moveSimcards)

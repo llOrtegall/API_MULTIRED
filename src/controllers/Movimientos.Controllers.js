@@ -1,22 +1,20 @@
 import { BodegaModel, MovimientoModel } from '../Models/Models.js'
-import { ConnetMongoDB } from '../Connections/MongoDb.js'
 import moment from 'moment-timezone'
 
 export const getMovimientos = async (req, res) => {
   try {
-    await ConnetMongoDB()
     const movimientos = await MovimientoModel.find().populate('items').populate('bodegaOrigen').populate('bodegaDestino').populate('simcards.entran').populate('simcards.salen')
-    res.status(200).json(movimientos)
+    return res.status(200).json(movimientos)
   } catch (error) {
     console.error(error)
-    res.status(500).json({ error: 'Error al obtener los movimientos' })
+    return res.status(500).json({ error: 'Error al obtener los movimientos' })
   }
 }
 
 export const moveItems = async (req, res) => {
-  const { itemsIds, bodegaOrigen, bodegaDestino, encargado, incidente, descripcion } = req.body
+  const { itemsIds, bodegaOrigen, bodegaDestino, encargado, incidente, descripcion, company } = req.body
 
-  if (!itemsIds || !bodegaOrigen || !bodegaDestino || !encargado || !incidente || !descripcion) {
+  if (!itemsIds || !bodegaOrigen || !bodegaDestino || !encargado || !incidente || !descripcion || !company) {
     return res.status(400).json({ error: 'Faltan campos requeridos' })
   }
 
@@ -29,7 +27,6 @@ export const moveItems = async (req, res) => {
   }
 
   try {
-    await ConnetMongoDB()
     // Encuentra las bodegas
     const sourceBodega = await BodegaModel.findById(bodegaOrigen)
     const targetBodega = await BodegaModel.findById(bodegaDestino)
@@ -76,7 +73,7 @@ export const moveItems = async (req, res) => {
     await sourceBodega.save()
     await targetBodega.save()
 
-    res.status(200).json({ message: 'Ítems movidos con éxito' })
+    return res.status(200).json({ message: 'Ítems movidos con éxito' })
   } catch (error) {
     if (error.code === 11000) {
       console.log(error)
@@ -86,16 +83,14 @@ export const moveItems = async (req, res) => {
       return res.status(400)
         .json({ error: `Error: ${Code}, ${name} = ${Value} Ya Existe !!!` })
     }
-    res.status(500).json({ error: 'Error al mover los ítems' })
+    return res.status(500).json({ error: 'Error al mover los ítems' })
   }
 }
 
 export const moveSimcards = async (req, res) => {
-  const { simsIds, bodegas, encargado, incidente, descripcion } = req.body
+  const { simsIds, bodegas, encargado, incidente, descripcion, company } = req.body
 
-  console.log(simsIds); console.log(bodegas); console.log(encargado); console.log(incidente); console.log(descripcion)
-
-  if (!simsIds || !bodegas || !encargado || !incidente || !descripcion) {
+  if (!simsIds || !bodegas || !encargado || !incidente || !descripcion || !company) {
     return res.status(400).json({ error: 'Faltan campos requeridos' })
   }
 
@@ -108,7 +103,6 @@ export const moveSimcards = async (req, res) => {
   }
 
   try {
-    await ConnetMongoDB()
     // Encuentra las bodegas
     const sourceBodega = await BodegaModel.findById(bodegas.bodegaOrigen)
     const targetBodega = await BodegaModel.findById(bodegas.bodegaDestino)
@@ -155,7 +149,7 @@ export const moveSimcards = async (req, res) => {
     await sourceBodega.save()
     await targetBodega.save()
 
-    res.status(200).json({ message: 'Ítems movidos con éxito' })
+    return res.status(200).json({ message: 'Ítems movidos con éxito' })
   } catch (error) {
     if (error.code === 11000) {
       console.log(error)
@@ -165,21 +159,25 @@ export const moveSimcards = async (req, res) => {
       return res.status(400)
         .json({ error: `Error: ${Code}, ${name} = ${Value} Ya Existe !!!` })
     }
-    res.status(500).json({ error: 'Error al mover los ítems' })
+    return res.status(500).json({ error: 'Error al mover los ítems' })
   }
 }
 
 export const getMovimiento = async (req, res) => {
-  const { id } = req.params
+  const { id, company } = req.params
+
+  if (!id || !company) {
+    return res.status(400).json({ error: 'Faltan campos requeridos' })
+  }
+
   try {
-    await ConnetMongoDB()
     const movimiento = await MovimientoModel.findById(id).populate('items')
       .populate('bodegaOrigen', 'sucursal nombre direccion')
       .populate('bodegaDestino', 'sucursal nombre direccion')
       .populate('simcards.entran', 'numero operador serial estado').populate('simcards.salen', 'numero operador serial estado')
-    res.status(200).json(movimiento)
+    return res.status(200).json(movimiento)
   } catch (error) {
     console.error(error)
-    res.status(500).json({ error: 'Error al obtener el movimiento' })
+    return res.status(500).json({ error: 'Error al obtener el movimiento' })
   }
 }

@@ -1,10 +1,8 @@
 import { BodegaModel, SimcardModel } from '../Models/Models.js'
-import { ConnetMongoDB } from '../Connections/MongoDb.js'
 
 export const createSimcard = async (req, res) => {
-  const { numero, operador, estado, serial, apn, user, pass } = req.body
-
-  if (!numero || !operador || !estado || !serial || !user || !pass) {
+  const { numero, operador, estado, serial, apn, user, pass, company } = req.body
+  if (!numero || !operador || !estado || !serial || !user || !pass || !company) {
     return res.status(400).json({ error: 'Faltan campos requeridos' })
   }
 
@@ -17,10 +15,9 @@ export const createSimcard = async (req, res) => {
   }
 
   try {
-    await ConnetMongoDB()
     const simcard = new SimcardModel({ numero, operador, estado, serial, apn, user, pass })
     await simcard.save()
-    res.status(201).json(simcard)
+    return res.status(201).json(simcard)
   } catch (error) {
     console.error(error)
     if (error.code === 11000) {
@@ -28,18 +25,12 @@ export const createSimcard = async (req, res) => {
       const value = error.keyValue[field]
       return res.status(400).json({ error: `El Campo: ${field} con el Valor: ${value} ya existe` })
     }
-    res.status(500).json({ error: 'Error al crear la simcard' })
+    return res.status(500).json({ error: 'Error al crear la simcard' })
   }
-}
-
-export const getSimcard = async (req, res) => {
-
 }
 
 export const getSimcardWhitBodega = async (req, res) => {
   try {
-    await ConnetMongoDB()
-
     const simcards = await SimcardModel.find()
     const bodegas = await BodegaModel.find().populate('simcards')
 
@@ -55,23 +46,22 @@ export const getSimcardWhitBodega = async (req, res) => {
       bodega: bodegasMap[item._id.toString()] || 'No Asignado'
     }))
 
-    res.status(200).json(itemsWithBodegas)
+    return res.status(200).json(itemsWithBodegas)
   } catch (error) {
     console.error(error)
-    res.status(500).json({ error: 'Error al obtener los ítems y las bodegas' })
+    return res.status(500).json({ error: 'Error al obtener los ítems y las bodegas' })
   }
 }
 
 export const addSimcardToBodega = async (req, res) => {
-  const { sucursal, simcardIds } = req.body
+  const { sucursal, simcardIds, company } = req.body
 
-  if (!sucursal || !simcardIds) {
+  if (!sucursal || !simcardIds || !company) {
     res.status(400).json({ error: 'Faltan campos requeridos' })
     return
   }
 
   try {
-    await ConnetMongoDB()
     const bodega = await BodegaModel.findOne({ sucursal })
     if (!bodega) {
       res.status(404).json({ error: 'No se encontró la bodega con la sucursal proporcionada' })
@@ -90,14 +80,9 @@ export const addSimcardToBodega = async (req, res) => {
     bodega.simcards.push(...simcards.map(simcard => simcard._id))
     await bodega.save()
 
-    res.status(200).json({ message: `Simcard(s) agregadas correctamente a Bodega: ${sucursal}` })
+    return res.status(200).json({ message: `Simcard(s) agregadas correctamente a Bodega: ${sucursal}` })
   } catch (error) {
     console.error(error)
     return res.status(500).json({ error: 'Error al agregar los ítems a bodega', message: error })
   }
-}
-
-// TODo: Movimientos de simcards
-export const CrearMovimientoSimcard = async (req, res) => {
-
 }
