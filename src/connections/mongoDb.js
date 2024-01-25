@@ -5,7 +5,7 @@ export const ConnetMongoDB = async () => {
     if (mongoose.connection.readyState) {
       await mongoose.connection.close()
     }
-    await mongoose.connect(process.env.MONGODB_URI_MULTIRED)
+    return await mongoose.connect(process.env.MONGODB_URI_MULTIRED)
   } catch (error) {
     console.log('MongoDB connection error', error)
     throw new Error('MongoDB connection error')
@@ -17,7 +17,7 @@ export const ConnetMongoServired = async () => {
     if (mongoose.connection.readyState) {
       await mongoose.connection.close()
     }
-    await mongoose.connect(process.env.MONGODB_URI_SERVIRED)
+    return await mongoose.connect(process.env.MONGODB_URI_SERVIRED)
   } catch (error) {
     console.log('MongoDB connection error', error)
     throw new Error('MongoDB connection error')
