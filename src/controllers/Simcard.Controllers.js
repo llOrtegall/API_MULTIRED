@@ -1,10 +1,8 @@
 import { BodegaModel, SimcardModel } from '../Models/Models.js'
-import { ConnetMongoDB } from '../Connections/MongoDb.js'
 
 export const createSimcard = async (req, res) => {
-  const { numero, operador, estado, serial, apn, user, pass } = req.body
-
-  if (!numero || !operador || !estado || !serial || !user || !pass) {
+  const { numero, operador, estado, serial, apn, user, pass, company } = req.body
+  if (!numero || !operador || !estado || !serial || !user || !pass || !company) {
     return res.status(400).json({ error: 'Faltan campos requeridos' })
   }
 
@@ -17,7 +15,6 @@ export const createSimcard = async (req, res) => {
   }
 
   try {
-    await ConnetMongoDB()
     const simcard = new SimcardModel({ numero, operador, estado, serial, apn, user, pass })
     await simcard.save()
     res.status(201).json(simcard)
@@ -32,14 +29,8 @@ export const createSimcard = async (req, res) => {
   }
 }
 
-export const getSimcard = async (req, res) => {
-
-}
-
 export const getSimcardWhitBodega = async (req, res) => {
   try {
-    await ConnetMongoDB()
-
     const simcards = await SimcardModel.find()
     const bodegas = await BodegaModel.find().populate('simcards')
 
@@ -63,15 +54,14 @@ export const getSimcardWhitBodega = async (req, res) => {
 }
 
 export const addSimcardToBodega = async (req, res) => {
-  const { sucursal, simcardIds } = req.body
+  const { sucursal, simcardIds, company } = req.body
 
-  if (!sucursal || !simcardIds) {
+  if (!sucursal || !simcardIds || !company) {
     res.status(400).json({ error: 'Faltan campos requeridos' })
     return
   }
 
   try {
-    await ConnetMongoDB()
     const bodega = await BodegaModel.findOne({ sucursal })
     if (!bodega) {
       res.status(404).json({ error: 'No se encontró la bodega con la sucursal proporcionada' })
@@ -95,9 +85,4 @@ export const addSimcardToBodega = async (req, res) => {
     console.error(error)
     return res.status(500).json({ error: 'Error al agregar los ítems a bodega', message: error })
   }
-}
-
-// TODo: Movimientos de simcards
-export const CrearMovimientoSimcard = async (req, res) => {
-
 }
