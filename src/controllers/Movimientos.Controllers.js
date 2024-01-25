@@ -12,9 +12,9 @@ export const getMovimientos = async (req, res) => {
 }
 
 export const moveItems = async (req, res) => {
-  const { itemsIds, bodegaOrigen, bodegaDestino, encargado, incidente, descripcion } = req.body
+  const { itemsIds, bodegaOrigen, bodegaDestino, encargado, incidente, descripcion, company } = req.body
 
-  if (!itemsIds || !bodegaOrigen || !bodegaDestino || !encargado || !incidente || !descripcion) {
+  if (!itemsIds || !bodegaOrigen || !bodegaDestino || !encargado || !incidente || !descripcion || !company) {
     return res.status(400).json({ error: 'Faltan campos requeridos' })
   }
 
@@ -88,11 +88,9 @@ export const moveItems = async (req, res) => {
 }
 
 export const moveSimcards = async (req, res) => {
-  const { simsIds, bodegas, encargado, incidente, descripcion } = req.body
+  const { simsIds, bodegas, encargado, incidente, descripcion, company } = req.body
 
-  console.log(simsIds); console.log(bodegas); console.log(encargado); console.log(incidente); console.log(descripcion)
-
-  if (!simsIds || !bodegas || !encargado || !incidente || !descripcion) {
+  if (!simsIds || !bodegas || !encargado || !incidente || !descripcion || !company) {
     return res.status(400).json({ error: 'Faltan campos requeridos' })
   }
 

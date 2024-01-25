@@ -7,9 +7,9 @@ export const setDatabaseConnection = async (req, res, next) => {
   }
 
   try {
-    if (company === 'multired') {
+    if (company === 'Multired') {
       await ConnetMongoDB()
-    } else if (company === 'servired') {
+    } else if (company === 'Servired') {
       await ConnetMongoServired()
     } else {
       return res.status(400).send('Compañía no reconocida')
