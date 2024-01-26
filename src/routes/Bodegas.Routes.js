@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { createBodega, getBodegaSucursal, getBodegas, findBodegaWithItems, addItemToBodega, getBodegasSim, getBodegaSucursalItemsSimcards, getBodegaSucursalSimcards } from '../Controllers/Bodegas.Controllers.js'
+import { createBodega, getBodegaSucursal, getBodegas, findBodegaWithItems, addItemToBodega, getBodegasSim, getBodegaSucursalItemsSimcards, getBodegaSucursalSimcards } from '../controllers/Bodegas.Controllers.js'
 import { setDatabaseConnection } from '../middleware/setDatabase.js'
 
 export const BodegasMongoDB = Router()

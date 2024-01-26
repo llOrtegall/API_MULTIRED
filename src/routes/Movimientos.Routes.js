@@ -1,4 +1,4 @@
-import { getMovimiento, getMovimientos, moveItems, moveSimcards } from '../Controllers/Movimientos.Controllers.js'
+import { getMovimiento, getMovimientos, moveItems, moveSimcards } from '../controllers/Movimientos.Controllers.js'
 import { setDatabaseConnection } from '../middleware/setDatabase.js'
 import { Router } from 'express'
 

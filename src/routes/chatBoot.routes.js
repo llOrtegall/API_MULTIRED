@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { getClientes, updateCliente, reportCliente } from '../Controllers/ChatBoot.Controllers.js'
+import { getClientes, updateCliente, reportCliente } from '../controllers/ChatBoot.Controllers.js'
 
 export const ChatBoot = Router()
 

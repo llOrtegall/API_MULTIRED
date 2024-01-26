@@ -1,6 +1,6 @@
-import { resportEmail, consultaTable } from '../Utils/funtionsReutilizables.js'
-import { getPoolChatBot } from '../Connections/MysqlDBChatBot.js'
-import { validateUser } from '../Schemas/UserSchema.js'
+import { resportEmail, consultaTable } from '../utils/funtionsReutilizables.js'
+import { getPoolChatBot } from '../connections/mysqlDBChatBot.js'
+import { validateUser } from '../schemas/userSchema.js'
 
 export const getClientes = async (req, res) => {
   const company = (req.query.select)

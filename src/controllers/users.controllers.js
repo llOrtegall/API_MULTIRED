@@ -1,6 +1,6 @@
-import { ValidarUsuario } from '../Schemas/UserSchema.js'
+import { ValidarUsuario } from '../schemas/userSchema.js'
 
-import { getUsersService, LoginService, registerUserService, changePasswordService, forgotPasswordService, ResetPasswordService } from '../Services/User.services.js'
+import { getUsersService, LoginService, registerUserService, changePasswordService, forgotPasswordService, ResetPasswordService } from '../services/user.services.js'
 
 import jwt from 'jsonwebtoken'
 const JWT_SECRET = process.env.JWT_SECRET

@@ -1,4 +1,4 @@
-import { createSimcard, getSimcardWhitBodega, addSimcardToBodega } from '../Controllers/Simcard.Controllers.js'
+import { createSimcard, getSimcardWhitBodega, addSimcardToBodega } from '../controllers/Simcard.Controllers.js'
 import { setDatabaseConnection } from '../middleware/setDatabase.js'
 import { Router } from 'express'
 

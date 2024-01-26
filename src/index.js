@@ -1,15 +1,15 @@
 import 'dotenv/config.js'
 
-import { validateEnvVariables } from './Utils/Validacion.js'
+import { validateEnvVariables } from './utils/Validacion.js'
 
-import { MovimientosMongoDB } from './Routes/Movimientos.Routes.js'
-import { SimcardsMongoDB } from './Routes/Simcares.Routes.js'
-import { BodegasMongoDB } from './Routes/Bodegas.Routes.js'
-import { ItemsMongoDB } from './Routes/Items.Routes.js'
+import { MovimientosMongoDB } from './routes/Movimientos.Routes.js'
+import { SimcardsMongoDB } from './routes/Simcares.Routes.js'
+import { BodegasMongoDB } from './routes/Bodegas.Routes.js'
+import { ItemsMongoDB } from './routes/Items.Routes.js'
 
-import { ClienteFiel } from './Routes/ClienteFiel.Routes.js'
-import { ChatBoot } from './Routes/ChatBoot.Routes.js'
-import { LoginUser } from './Routes/Users.Routes.js'
+import { ClienteFiel } from './routes/clienteFiel.routes.js'
+import { ChatBoot } from './routes/chatBoot.routes.js'
+import { LoginUser } from './routes/users.routes.js'
 
 import cookieParser from 'cookie-parser'
 import express from 'express'
@@ -18,6 +18,8 @@ import cors from 'cors'
 
 const ACCEPTED_ORIGINS = [
   'http://172.20.1.160',
+  'http://172.20.1.70',
+  'http://172.20.1.70:8000',
   'http://172.20.1.110:5173',
   'http://localhost:5173'
 ]

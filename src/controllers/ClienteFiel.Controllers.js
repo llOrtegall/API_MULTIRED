@@ -1,6 +1,6 @@
-import { obtenerFechaActual, sendEmail, sendEmailServired, separarNombre } from '../Utils/funtionsReutilizables.js'
-import { validateClientUser } from '../Schemas/UserSchema.js'
-import { conectOraDB } from '../Connections/OracleDB.js'
+import { obtenerFechaActual, sendEmail, sendEmailServired, separarNombre } from '../utils/funtionsReutilizables.js'
+import { validateClientUser } from '../schemas/userSchema.js'
+import { conectOraDB } from '../connections/oracleDB.js'
 
 export const getClientFiel = async (req, res) => {
   const { ccs } = req.body
