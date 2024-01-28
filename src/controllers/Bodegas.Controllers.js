@@ -95,6 +95,11 @@ export const addItemToBodega = async (req, res) => {
     return
   }
 
+  if(itemIds.length === 0) {
+    res.status(400).json({ error: 'Se debe seleccionar mínimo un Ítem.' })
+    return
+  }
+
   try {
     const bodega = await BodegaModel.findOne({ sucursal })
     if (!bodega) {
