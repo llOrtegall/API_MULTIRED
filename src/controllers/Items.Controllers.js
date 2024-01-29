@@ -53,8 +53,8 @@ export const updateItem = async (req, res) => {
       throw new Error('Faltan campos requeridos')
     }
 
-    const plateRegex = company === 'multired' ? /^MI-\d{1,5}$|^MA-\d{1,5}$/ : /^SI-\d{1,5}$|^SA-\d{1,5}$/
-    const plateError = company === 'multired' ? 'La placa debe comenzar con "MI-" o "MA-" seguido de un número de hasta 5 dígitos' : 'La placa debe comenzar con "SI-" o "SA-" seguido de un número de hasta 5 dígitos'
+    const plateRegex = company === 'Multired' ? /^MI-\d{1,5}$|^MA-\d{1,5}$/ : /^SI-\d{1,5}$|^SA-\d{1,5}$/
+    const plateError = company === 'Multired' ? 'La placa debe comenzar con "MI-" o "MA-" seguido de un número de hasta 5 dígitos' : 'La placa debe comenzar con "SI-" o "SA-" seguido de un número de hasta 5 dígitos'
 
     if (!plateRegex.test(placa)) {
       throw new Error(plateError)

@@ -11,7 +11,7 @@ const BCRYPT_SALT_ROUNDS = 10
 
 export const getUsersService = async () => {
   const pool = await getPoolLogin()
-  const [response] = await pool.query('SELECT *, BIN_TO_UUID(id) FROM login_chat')
+  const [response] = await pool.query('SELECT *, BIN_TO_UUID(id) FROM login')
   response.forEach((element) => {
     element.estado = State({ estado: element.estado })
     element.empresa = Company({ empresa: element.empresa })
@@ -28,7 +28,7 @@ export const LoginService = async (data) => {
     throw new Error('El Usuario / Contraseña Son Requeridos')
   }
   const pool = await getPoolLogin()
-  const [result] = await pool.query('SELECT *, BIN_TO_UUID(id) FROM login_chat WHERE username = ?', [user])
+  const [result] = await pool.query('SELECT *, BIN_TO_UUID(id) FROM login WHERE username = ?', [user])
   if (result.length === 0) {
     throw new Error(`El Usuario ${user} No Se Encuentra Registrado`)
   }
@@ -54,7 +54,7 @@ export const LoginService = async (data) => {
 export const registerUserService = async ({ data }) => {
   const pool = await getPoolLogin()
   const { nombres, apellidos, documento, telefono, correo, empresa, proceso, rol } = data.data
-  const [existingUser] = await pool.query('SELECT documento FROM login_chat WHERE documento = ?', [documento])
+  const [existingUser] = await pool.query('SELECT documento FROM login WHERE documento = ?', [documento])
   if (existingUser.length > 0) {
     throw new Error(`El usuario con el documento N° ${documento} ya existe.`)
   }
@@ -62,7 +62,7 @@ export const registerUserService = async ({ data }) => {
   const username = generateUsername(documento)
   const passwordHash = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS)
   const [createdUser] = await pool.query(
-    `INSERT INTO login_chat (nombres, apellidos, documento, telefono, correo, username, password, estado, empresa, proceso, rol) 
+    `INSERT INTO login (nombres, apellidos, documento, telefono, correo, username, password, estado, empresa, proceso, rol) 
      VALUES (?, ?, ?, ?, ?, ?, ?, TRUE, ?, ?, ?);`,
     [nombres, apellidos, documento, telefono, correo, username, passwordHash, empresa, proceso, rol]
   )
@@ -78,7 +78,7 @@ export const changePasswordService = async (data) => {
     throw new Error('Todos los campos son obligatorios')
   }
   const pool = await getPoolLogin()
-  const [users] = await pool.query('SELECT * FROM login_chat WHERE username = ?', [username])
+  const [users] = await pool.query('SELECT * FROM login WHERE username = ?', [username])
   if (users.length === 0) {
     throw new Error('Credenciales inválidas')
   }
@@ -91,7 +91,7 @@ export const changePasswordService = async (data) => {
     throw new Error('La nueva contraseña no coinciden')
   }
   const hashedPassword = await bcrypt.hash(newPassword, BCRYPT_SALT_ROUNDS)
-  const [updateResult] = await pool.query('UPDATE login_chat SET password = ? WHERE username = ?', [hashedPassword, username])
+  const [updateResult] = await pool.query('UPDATE login SET password = ? WHERE username = ?', [hashedPassword, username])
   if (updateResult.affectedRows === 0) {
     throw new Error('No se pudo actualizar la contraseña')
   }
@@ -101,7 +101,7 @@ export const changePasswordService = async (data) => {
 export const forgotPasswordService = async (data) => {
   const { username, correo } = data
   const pool = await getPoolLogin()
-  const [result] = await pool.query('SELECT * FROM login_chat WHERE username = ? AND correo = ?', [username, correo])
+  const [result] = await pool.query('SELECT * FROM login WHERE username = ? AND correo = ?', [username, correo])
   if (result.length === 0) {
     throw new Error('Usuario No Econtrado Verificar Datos')
   }
@@ -109,7 +109,7 @@ export const forgotPasswordService = async (data) => {
   const token = crypto.randomBytes(40).toString('hex')
   const now = new Date()
   now.setMinutes(now.getMinutes() + 10)
-  await pool.query('UPDATE login_chat SET resetPasswordToken = ?, resetPasswordExpires = ? WHERE username = ? OR correo = ?', [token, now, username, correo])
+  await pool.query('UPDATE login SET resetPasswordToken = ?, resetPasswordExpires = ? WHERE username = ? OR correo = ?', [token, now, username, correo])
   const { nombres, apellidos, documento, empresa, rol } = (result[0])
   const companyParsed = Company({ empresa })
   const user = { nombres, apellidos, documento, empresa: companyParsed, rol, correo }
@@ -120,7 +120,7 @@ export const forgotPasswordService = async (data) => {
 export const ResetPasswordService = async (data) => {
   const { token, password } = data
   const pool = await getPoolLogin()
-  const [result] = await pool.query('SELECT * FROM login_chat WHERE resetPasswordToken = ?', [token])
+  const [result] = await pool.query('SELECT * FROM login WHERE resetPasswordToken = ?', [token])
   if (result.length === 0) {
     throw new Error('Token inválido')
   }
@@ -129,7 +129,7 @@ export const ResetPasswordService = async (data) => {
     throw new Error('Token expirado')
   }
   const hashedPassword = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS)
-  const result2 = await pool.query('UPDATE login_chat SET password = ?, resetPasswordToken = ?, resetPasswordExpires = ? WHERE resetPasswordToken = ?', [hashedPassword, '', null, token])
+  const result2 = await pool.query('UPDATE login SET password = ?, resetPasswordToken = ?, resetPasswordExpires = ? WHERE resetPasswordToken = ?', [hashedPassword, '', null, token])
   if (result2.length === 0) {
     throw new Error('Error al recuperar la contraseña')
   }

@@ -6,6 +6,11 @@ export const createSimcard = async (req, res) => {
     return res.status(400).json({ error: 'Faltan campos requeridos' })
   }
 
+  const serialRegex = /^\d+$/
+  if (!serialRegex.test(serial) || serial.length < 6) {
+    return res.status(400).json({ error: 'Serial no válido. Debe ser un número de al menos 6 dígitos.' })
+  }
+
   if (operador !== 'Claro' && operador !== 'Movistar' && operador !== 'Tigo') {
     return res.status(400).json({ error: 'Operador no valido' })
   }
