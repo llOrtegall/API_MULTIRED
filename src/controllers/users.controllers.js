@@ -1,9 +1,6 @@
 import { ValidarUsuario } from '../schemas/userSchema.js'
 
-import { getUsersService, LoginService, registerUserService, changePasswordService, forgotPasswordService, ResetPasswordService } from '../services/user.services.js'
-
-import jwt from 'jsonwebtoken'
-const JWT_SECRET = process.env.JWT_SECRET
+import { getUsersService, getUserByToken, LoginService, registerUserService, changePasswordService, forgotPasswordService, ResetPasswordService } from '../services/user.services.js'
 
 export const getUsers = async (req, res) => {
   try {
@@ -14,25 +11,24 @@ export const getUsers = async (req, res) => {
   }
 }
 
-export const UserByToken = async (req, res) => {
-  const token = req.headers.authorization?.split(' ')[1]
+export const LogOutUser = async (req, res) => {
+  res.cookie('token', '', { sameSite: 'none', secure: true }).status(200).json({ auth: false })
+}
 
-  if (token !== 'null' && token !== undefined) {
-    try {
-      const user = jwt.verify(token, JWT_SECRET)
-      return res.status(200).json({ auth: true, user })
-    } catch (error) {
-      return res.status(401).json({ error: 'Token Invalido' })
-    }
+export const UserByToken = async (req, res) => {
+  const token = req.cookies?.token
+  if (token) {
+    const promiseToken = await getUserByToken(token)
+    res.status(200).json(promiseToken)
   } else {
-    return res.status(401).json({ error: 'No se ha enviado el token' })
+    return res.status(401).json({ message: 'No se encuentra el token' })
   }
 }
 
 export const Login = async (req, res) => {
   try {
-    const result = await LoginService(req.body)
-    return res.status(200).json(result)
+    const { token, UserLogin } = await LoginService(req.body)
+    return res.cookie('token', token, { sameSite: 'none', secure: true }).status(200).json({ auth: true, UserLogin })
   } catch (error) {
     console.log(error)
     return res.status(400).json({ message: error.message })
