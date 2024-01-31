@@ -17,12 +17,8 @@ import morgan from 'morgan'
 import cors from 'cors'
 
 const ACCEPTED_ORIGINS = [
-  'http://172.20.1.110:5173'
-  // 'http://172.20.1.160',
-  // 'http://172.20.1.70',
-  // 'http://172.20.1.70:8000',
-  // 'http://172.20.1.110:5173',
-  // 'http://localhost:5173'
+  'http://172.20.1.160',
+  'http://localhost'
 ]
 
 const app = express()
