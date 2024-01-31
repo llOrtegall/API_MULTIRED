@@ -21,6 +21,18 @@ export const getUsersService = async () => {
   return response
 }
 
+export const getUserByToken = async (token) => {
+  return new Promise((resolve, reject) => {
+    jwt.verify(token, JWT_SECRET, {}, async (err, userData) => {
+      if (err) {
+        reject(new Error('Token inválido'))
+      }
+      const { UserLogin } = userData
+      resolve({ auth: true, UserLogin })
+    })
+  })
+}
+
 export const LoginService = async (data) => {
   const { user, password } = data
 
@@ -47,8 +59,17 @@ export const LoginService = async (data) => {
     element.empresa = Company({ empresa: element.empresa })
     element.proceso = Proceso({ proceso: element.proceso })
   })
-  const token = jwt.sign(result[0], JWT_SECRET, { expiresIn: '1h' })
-  return { auth: true, token }
+
+  const UserLogin = result[0]
+
+  return new Promise((resolve, reject) => {
+    jwt.sign({ UserLogin }, JWT_SECRET, { expiresIn: '30m' }, (err, token) => {
+      if (err) {
+        reject(new Error('Error al generar el token'))
+      }
+      resolve({ token, UserLogin })
+    })
+  })
 }
 
 export const registerUserService = async ({ data }) => {
