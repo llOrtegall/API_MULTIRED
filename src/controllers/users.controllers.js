@@ -18,8 +18,12 @@ export const LogOutUser = async (req, res) => {
 export const UserByToken = async (req, res) => {
   const token = req.cookies?.token
   if (token) {
-    const promiseToken = await getUserByToken(token)
-    res.status(200).json(promiseToken)
+    try {
+      const Responde = await getUserByToken(token)
+      res.status(200).json({ auth: Responde.auth, UserLogin: Responde.UserLogin.UserLogin })
+    } catch (error) {
+      return res.status(401).json({ message: error.message })
+    }
   } else {
     return res.status(401).json({ message: 'No se encuentra el token' })
   }
