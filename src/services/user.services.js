@@ -23,11 +23,10 @@ export const getUsersService = async () => {
 
 export const getUserByToken = async (token) => {
   return new Promise((resolve, reject) => {
-    jwt.verify(token, JWT_SECRET, {}, async (err, userData) => {
+    jwt.verify(token, JWT_SECRET, {}, async (err, UserLogin) => {
       if (err) {
         reject(new Error('Token inválido'))
       }
-      const { UserLogin } = userData
       resolve({ auth: true, UserLogin })
     })
   })
