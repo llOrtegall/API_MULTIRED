@@ -37,7 +37,7 @@ export const LoginService = async (data) => {
   if (result[0].estado === 0) {
     throw new Error('Usuario Se Ecuentra Inactivo')
   }
-  delete result[0].id; delete result[0].password; delete result[0].password2; delete result[0].estado; delete result[0].resetPasswordToken; delete result[0].resetPasswordExpires; delete result[0].documento; delete result[0].telefono; delete result[0].fecha_creacion; delete result[0].username; delete result[0].correo
+  delete result[0].id; delete result[0].password; delete result[0].password2; delete result[0].estado; delete result[0].resetPasswordToken; delete result[0].resetPasswordExpires; delete result[0].documento; delete result[0].telefono; delete result[0].fecha_creacion;
 
   const { 'BIN_TO_UUID(id)': id, ...rest } = result[0]
   result[0] = { id, ...rest }
