@@ -3,10 +3,8 @@ import { Company, Proceso, State } from '../utils/Definiciones.js'
 import { getPoolLogin } from '../connections/mysqlLoginDB.js'
 
 import bcrypt from 'bcryptjs'
-import jwt from 'jsonwebtoken'
 import crypto from 'crypto'
 
-const JWT_SECRET = process.env.JWT_SECRET
 const BCRYPT_SALT_ROUNDS = 10
 
 export const getUsersService = async () => {
@@ -19,17 +17,6 @@ export const getUsersService = async () => {
     delete element.id
   })
   return response
-}
-
-export const getUserByToken = async (token) => {
-  return new Promise((resolve, reject) => {
-    jwt.verify(token, JWT_SECRET, {}, async (err, UserLogin) => {
-      if (err) {
-        reject(new Error('Token inválido'))
-      }
-      resolve({ auth: true, UserLogin })
-    })
-  })
 }
 
 export const LoginService = async (data) => {
@@ -50,7 +37,8 @@ export const LoginService = async (data) => {
   if (result[0].estado === 0) {
     throw new Error('Usuario Se Ecuentra Inactivo')
   }
-  delete result[0].id; delete result[0].password; delete result[0].password2; delete result[0].estado
+  delete result[0].id; delete result[0].password; delete result[0].password2; delete result[0].estado; delete result[0].resetPasswordToken; delete result[0].resetPasswordExpires; delete result[0].documento; delete result[0].telefono; delete result[0].fecha_creacion; delete result[0].username; delete result[0].correo
+
   const { 'BIN_TO_UUID(id)': id, ...rest } = result[0]
   result[0] = { id, ...rest }
 
@@ -59,16 +47,7 @@ export const LoginService = async (data) => {
     element.proceso = Proceso({ proceso: element.proceso })
   })
 
-  const UserLogin = result[0]
-
-  return new Promise((resolve, reject) => {
-    jwt.sign({ UserLogin }, JWT_SECRET, { expiresIn: '30m' }, (err, token) => {
-      if (err) {
-        reject(new Error('Error al generar el token'))
-      }
-      resolve({ token, UserLogin })
-    })
-  })
+  return result[0]
 }
 
 export const registerUserService = async ({ data }) => {
