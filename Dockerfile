@@ -31,6 +31,6 @@ RUN npm install -g yarn
 
 RUN yarn
 
-EXPOSE 3000
+EXPOSE 4002
 
 CMD [ "yarn", "start" ]
