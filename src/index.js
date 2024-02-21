@@ -18,6 +18,8 @@ import cors from 'cors'
 
 const ACCEPTED_ORIGINS = [
   'http://172.20.1.160',
+  'http://aplicaciones_gane.com',
+  'http://172.20.1.70',
   'http://172.20.1.110:5173',
   'http://localhost:5173'
 ]
