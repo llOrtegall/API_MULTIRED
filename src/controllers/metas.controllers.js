@@ -1,4 +1,4 @@
-import { pool } from '../connection/db.js'
+import { pool } from '../connections/metas.js'
 
 // TODO: Para hacer el login
 async function BuscarUsuarioByUsername (username) {
