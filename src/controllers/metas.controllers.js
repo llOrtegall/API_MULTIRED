@@ -5,31 +5,6 @@ async function BuscarUsuarioByUsername (username) {
   const [usuario] = await pool.execute('SELECT * FROM user WHERE username = ?', [username])
   return usuario
 }
-export const metasLogin = async (req, res) => {
-  const { username, password } = req.body
-  try {
-    const [usuarioencontrado] = await BuscarUsuarioByUsername(username)
-
-    // TODO: Si el usuario llega Validaremos la contraseña => password
-    if (usuarioencontrado) {
-      const valida = password === usuarioencontrado.password
-      if (!valida) return res.status(401).json({ error: 'Contraseña No Valida' })
-      res.status(200).json({
-        user: {
-          codigo: usuarioencontrado.codigo,
-          usuario: usuarioencontrado.username,
-          nombres: usuarioencontrado.nombres
-        }
-      })
-    } else {
-      res.status(404).json({ error: 'Usuario No Encontrado y/o No Existe' })
-    }
-  } catch (error) {
-    console.log(error)
-    res.status(500).json(error)
-  }
-}
-
 // TODO: Para traer la info del punto de venta
 async function InfoPuntoDeVenta (codigo) {
   const [infoPuntoDeVenta] = await pool.execute(
@@ -46,14 +21,32 @@ async function InfoPuntoDeVenta (codigo) {
   )
   return infoPuntoDeVenta
 }
-export const infoPuntoDeVenta = async (req, res) => {
-  const { codigo } = req.query
+
+export const metasLogin = async (req, res) => {
+  const { username, password } = req.body
   try {
-    const [infoPuntoDeVenta] = await InfoPuntoDeVenta(codigo)
-    res.status(200).json(infoPuntoDeVenta)
+    const [usuarioencontrado] = await BuscarUsuarioByUsername(username)
+
+    // TODO: Si el usuario llega Validaremos la contraseña => password
+    if (usuarioencontrado) {
+      const valida = password === usuarioencontrado.password
+      if (!valida) return res.status(401).json({ error: 'Contraseña No Valida' })
+      if (usuarioencontrado.estado !== 'A') {
+        return res.status(401).json({ error: 'Usuario No Activo' })
+      }
+
+      const [datosPVD] = await InfoPuntoDeVenta(usuarioencontrado.codigo)
+
+      delete usuarioencontrado.password
+      delete datosPVD.codigo
+
+      return res.status(200).json({ usuarioencontrado, datosPVD })
+    } else {
+      res.status(404).json({ error: 'Usuario No Encontrado y/o No Existe' })
+    }
   } catch (error) {
-    console.error('Error al obtener la información del punto de venta:', error)
-    res.status(500).json({ message: 'Hubo un problema al obtener la información del punto de venta. Por favor, inténtalo de nuevo más tarde.' })
+    console.log(error)
+    res.status(500).json(error)
   }
 }
 
