@@ -18,7 +18,12 @@ export function validateEnvVariables () {
     'JWT_SECRET',
     'EMAIL_SEND_REPORTS',
     'EMAIL_USER',
-    'EMAIL_PASS'
+    'EMAIL_PASS',
+    'METAS_HOST',
+    'METAS_USER',
+    'METAS_PASS',
+    'METAS_PORT',
+    'METAS_DATABASE'
   ]
 
   const undefinedVariables = requiredVariables.filter(variable => !process.env[variable])
