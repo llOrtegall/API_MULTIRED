@@ -1,5 +1,16 @@
 import { pool } from '../connections/metas.js'
 
+export const getUtilidades = async (req, res) => {
+  const { cedula } = req.query
+  try {
+    const cc = await cedula.substring(2)
+    const [utilidades] = await pool.query('SELECT * FROM comision_asesor where cc_asesor = ?', [cc])
+    return res.status(200).json(utilidades)
+  } catch (error) {
+    return res.status(500).json({ error: 'Error al consultar Table' })
+  }
+}
+
 // TODO: Para hacer el login
 async function BuscarUsuarioByUsername (username) {
   const [usuario] = await pool.execute('SELECT * FROM user WHERE username = ?', [username])

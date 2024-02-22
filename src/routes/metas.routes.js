@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { metasLogin, metasDelDia, cumplimientoDiaProducto, cumplimientoMesAnteriorProducto, CumplimientoMesActualProducto, SugeridosPrimeraConsulta, ConsultarBoletasGanas, SugeridosSegundaConsulta } from '../controllers/metas.controllers.js'
+import { metasLogin, metasDelDia, cumplimientoDiaProducto, cumplimientoMesAnteriorProducto, CumplimientoMesActualProducto, SugeridosPrimeraConsulta, ConsultarBoletasGanas, SugeridosSegundaConsulta, getUtilidades } from '../controllers/metas.controllers.js'
 
 export const RutasMetas = Router()
 
@@ -18,3 +18,5 @@ RutasMetas.post('/SugeridosPrimeraConsulta', SugeridosPrimeraConsulta)
 RutasMetas.post('/consultarBoletasGanas', ConsultarBoletasGanas)
 
 RutasMetas.post('/SugeridosSegundaConsulta', SugeridosSegundaConsulta)
+
+RutasMetas.get('/ultilidadesGet', getUtilidades)
