@@ -32,12 +32,22 @@ export const metasLogin = async (req, res) => {
 
 // TODO: Para traer la info del punto de venta
 async function InfoPuntoDeVenta (codigo) {
-  const [infoPuntoDeVenta] = await pool.execute(`select mt.zona, np.codigo , np.NOMBRE, np.SUPERVISOR,np.CATEGORIA,np.VERSION from GAMBLE.METASPRODUCTOS mt, GAMBLE.INFORMACION_PUNTOSVENTA np WHERE mt.SUCURSAL = ${codigo} and mt.FECHA=CURDATE() and mt.SUCURSAL=np.CODIGO;`)
-
+  const [infoPuntoDeVenta] = await pool.execute(
+    `select
+      mp.zona, ip.codigo, ip.NOMBRE, ip.SUPERVISOR, ip.CATEGORIA, ip.VERSION 
+    from 
+      METASPRODUCTOS mp, 
+      INFORMACION_PUNTOSVENTA ip 
+    WHERE 
+      mp.SUCURSAL = ${codigo} 
+      and mp.FECHA=CURDATE() 
+      and mp.SUCURSAL = ip.CODIGO;
+      `
+  )
   return infoPuntoDeVenta
 }
 export const infoPuntoDeVenta = async (req, res) => {
-  const { codigo } = req.body
+  const { codigo } = req.query
   try {
     const [infoPuntoDeVenta] = await InfoPuntoDeVenta(codigo)
     res.status(200).json(infoPuntoDeVenta)
@@ -52,9 +62,9 @@ async function BuscarMetasDelDia (codigo) {
   const [metas] = await pool.execute(
     `
     select 
-      mt.CHANCE+mt.PAGAMAS+mt.PAGATODO+mt.GANE5+mt.PATA_MILLONARIA+mt.DOBLECHANCE+mt.CHANCE_MILLONARIO venta_actual,
-      mt.PROMEDIO_DIARIO_CHANCE+mt.PROMEDIO_DIARIO_PAGAMAS+mt.PROMEDIO_DIARIO_PAGATODO+mt.PROMEDIO_DIARIO_PATAMI+mt.PROMEDIO_DIARIO_DOBLECHANCE+mt.PROMEDIO_DIARIO_CHMILL asp_dia
-      from METASPRODUCTOS mt, INFORMACION_PUNTOSVENTA np WHERE mt.SUCURSAL = ${codigo} and mt.FECHA=CURDATE() and mt.SUCURSAL=np.CODIGO;
+      mp.CHANCE+mp.PAGAMAS+mp.PAGATODO+mp.GANE5+mp.PATA_MILLONARIA+mp.DOBLECHANCE+mp.CHANCE_MILLONARIO venta_actual,
+      mp.PROMEDIO_DIARIO_CHANCE+mp.PROMEDIO_DIARIO_PAGAMAS+mp.PROMEDIO_DIARIO_PAGATODO+mp.PROMEDIO_DIARIO_PATAMI+mp.PROMEDIO_DIARIO_DOBLECHANCE+mp.PROMEDIO_DIARIO_CHMILL asp_dia
+      from METASPRODUCTOS mp, INFORMACION_PUNTOSVENTA ip WHERE mp.SUCURSAL = ${codigo} and mp.FECHA=CURDATE() and mp.SUCURSAL=ip.CODIGO;
     `
   )
   return metas
@@ -94,7 +104,7 @@ async function CumplimientoDiaProductoYumbo (codigo) {
 }
 async function CumplimientoDiaProductoJamundi (codigo) {
   const [cumplimiento] = await pool.execute(
-  `
+    `
     select
       mp.CHANCE, mp.PROMEDIO_DIARIO_CHANCE, mp.CHOLADITO, mp.PROMEDIO_DIARIO_CHOLADITO, mp.PAGATODO_JAMUNDI, mp.PROMEDIO_DIARIO_PGTJAMUNDI,
       mp.GANE5, mp.PROMEDIO_DIARIO_GANE5, mp.PATA_MILLONARIA, mp.PROMEDIO_DIARIO_PATAMI, mp.DOBLECHANCE, mp.PROMEDIO_DIARIO_DOBLECHANCE,
@@ -137,22 +147,22 @@ export const cumplimientoDiaProducto = async (req, res) => {
 async function CumMesActProdYumbo (codigo) {
   const [cumplimiento] = await pool.execute(
     `
-    select mt.sucursal, mt.EJE_CHANCE, mt.VTM_CHANCE, concat(round((mt.EJE_CHANCE)/(mt.VTM_CHANCE)*100,2),' %') PORCH, 
-      mt.EJE_PAGAMAS, mt.VTM_PAGAMAS, concat(round((mt.EJE_PAGAMAS)/(mt.VTM_PAGAMAS)*100,2),' %') PORPGM, 
-      mt.EJE_PAGATODO, mt.VTM_PAGATODO, concat(round((mt.EJE_PAGATODO)/(mt.VTM_PAGATODO)*100,2),' %') PORPGT, 
-      mt.EJE_GANE5, mt.VTM_GANE5, concat(round((mt.EJE_GANE5)/(mt.VTM_GANE5)*100,2),' %') PORGN5, 
-      mt.EJE_PATA_MILLONARIA, mt.VTM_PATA_MILLONARIA, concat(round((mt.EJE_PATA_MILLONARIA)/(mt.VTM_PATA_MILLONARIA)*100,2),' %') PORPTM, 
-      mt.EJE_DOBLECHANCE, mt.VTM_DOBLECHANCE, concat(round((mt.EJE_DOBLECHANCE)/(mt.VTM_DOBLECHANCE)*100,2),' %') PORDBCH, 
-      mt.EJE_CHANCE_MILLONARIO, mt.VTM_CHANCE_MILLONARIO, concat(round((mt.EJE_CHANCE_MILLONARIO)/(mt.VTM_CHANCE_MILLONARIO)*100,2),' %') PORCHM, 
-      mt.EJE_ASTRO, mt.VTM_ASTRO, concat(round((mt.EJE_ASTRO)/(mt.VTM_ASTRO)*100,2),' %') PORAST, 
-      mt.EJE_LOTERIA_FISICA, mt.VTM_LOTERIA_FISICA, concat(round((mt.EJE_LOTERIA_FISICA)/(mt.VTM_LOTERIA_FISICA)*100,2),' %') PORLTF, 
-      mt.EJE_LOTERIA_VIRTUAL, mt.VTM_LOTERIA_VIRTUAL, concat(round((mt.EJE_LOTERIA_VIRTUAL)/(mt.VTM_LOTERIA_VIRTUAL)*100,2),' %') PORLTV, 
-      mt.EJE_BETPLAY, mt.VTM_BETPLAY, concat(round((mt.EJE_BETPLAY)/(mt.VTM_BETPLAY)*100,2),' %') PORBTP, mt.EJE_GIROS, 
-      mt.VTM_GIROS, concat(round((mt.EJE_GIROS)/(mt.VTM_GIROS)*100,2),' %') PORSGR, mt.EJE_SOAT, mt.VTM_SOAT, concat(round((mt.EJE_SOAT)/(mt.VTM_SOAT)*100,2),' %') PORSOAT,
-      mt.EJE_RECAUDOS, mt.VTM_RECAUDOS, concat(round((mt.EJE_RECAUDOS)/(mt.VTM_RECAUDOS)*100,2),' %') PORECAU, mt.EJE_RECARGAS, 
-      mt.VTM_RECARGAS, concat(round((mt.EJE_RECARGAS)/(mt.VTM_RECARGAS)*100,2),' %') PORECAR, 0 PROMO1, 0 META_PROMO1, mt.EJE_RASPE, 
-      mt.VTM_RASPE, concat(round((mt.EJE_RASPE)/(mt.VTM_RASPE)*100,2),' %') PORASPE from GAMBLE.METAMES_ACUMULADO_MSR mt, GAMBLE.INFORMACION_PUNTOSVENTA np 
-    WHERE mt.SUCURSAL = ${codigo} and mt.MES=MONTH (NOW()) and FECHA=CURDATE() and mt.SUCURSAL=np.CODIGO;
+    select mp.sucursal, mp.EJE_CHANCE, mp.VTM_CHANCE, concat(round((mp.EJE_CHANCE)/(mp.VTM_CHANCE)*100,2),' %') PORCH, 
+      mp.EJE_PAGAMAS, mp.VTM_PAGAMAS, concat(round((mp.EJE_PAGAMAS)/(mp.VTM_PAGAMAS)*100,2),' %') PORPGM, 
+      mp.EJE_PAGATODO, mp.VTM_PAGATODO, concat(round((mp.EJE_PAGATODO)/(mp.VTM_PAGATODO)*100,2),' %') PORPGT, 
+      mp.EJE_GANE5, mp.VTM_GANE5, concat(round((mp.EJE_GANE5)/(mp.VTM_GANE5)*100,2),' %') PORGN5, 
+      mp.EJE_PATA_MILLONARIA, mp.VTM_PATA_MILLONARIA, concat(round((mp.EJE_PATA_MILLONARIA)/(mp.VTM_PATA_MILLONARIA)*100,2),' %') PORPTM, 
+      mp.EJE_DOBLECHANCE, mp.VTM_DOBLECHANCE, concat(round((mp.EJE_DOBLECHANCE)/(mp.VTM_DOBLECHANCE)*100,2),' %') PORDBCH, 
+      mp.EJE_CHANCE_MILLONARIO, mp.VTM_CHANCE_MILLONARIO, concat(round((mp.EJE_CHANCE_MILLONARIO)/(mp.VTM_CHANCE_MILLONARIO)*100,2),' %') PORCHM, 
+      mp.EJE_ASTRO, mp.VTM_ASTRO, concat(round((mp.EJE_ASTRO)/(mp.VTM_ASTRO)*100,2),' %') PORAST, 
+      mp.EJE_LOTERIA_FISICA, mp.VTM_LOTERIA_FISICA, concat(round((mp.EJE_LOTERIA_FISICA)/(mp.VTM_LOTERIA_FISICA)*100,2),' %') PORLTF, 
+      mp.EJE_LOTERIA_VIRTUAL, mp.VTM_LOTERIA_VIRTUAL, concat(round((mp.EJE_LOTERIA_VIRTUAL)/(mp.VTM_LOTERIA_VIRTUAL)*100,2),' %') PORLTV, 
+      mp.EJE_BETPLAY, mp.VTM_BETPLAY, concat(round((mp.EJE_BETPLAY)/(mp.VTM_BETPLAY)*100,2),' %') PORBTP, mp.EJE_GIROS, 
+      mp.VTM_GIROS, concat(round((mp.EJE_GIROS)/(mp.VTM_GIROS)*100,2),' %') PORSGR, mp.EJE_SOAT, mp.VTM_SOAT, concat(round((mp.EJE_SOAT)/(mp.VTM_SOAT)*100,2),' %') PORSOAT,
+      mp.EJE_RECAUDOS, mp.VTM_RECAUDOS, concat(round((mp.EJE_RECAUDOS)/(mp.VTM_RECAUDOS)*100,2),' %') PORECAU, mp.EJE_RECARGAS, 
+      mp.VTM_RECARGAS, concat(round((mp.EJE_RECARGAS)/(mp.VTM_RECARGAS)*100,2),' %') PORECAR, 0 PROMO1, 0 META_PROMO1, mp.EJE_RASPE, 
+      mp.VTM_RASPE, concat(round((mp.EJE_RASPE)/(mp.VTM_RASPE)*100,2),' %') PORASPE from GAMBLE.METAMES_ACUMULADO_MSR mp, GAMBLE.INFORMACION_PUNTOSVENTA ip 
+    WHERE mp.SUCURSAL = ${codigo} and mp.MES=MONTH (NOW()) and FECHA=CURDATE() and mp.SUCURSAL=ip.CODIGO;
     `
   )
 
@@ -161,25 +171,25 @@ async function CumMesActProdYumbo (codigo) {
 async function CumMesActProdJamundi (codigo) {
   const [cumplimiento] = await pool.execute(
     `
-    select mt.sucursal, 
-      mt.EJE_CHANCE, mt.VTM_CHANCE, concat(round((mt.EJE_CHANCE)/(mt.VTM_CHANCE)*100,2),' %') PORCH, 
-      mt.EJE_CHOLADITO, mt.VTM_CHOLADITO, concat(round((mt.EJE_CHOLADITO)/(mt.VTM_CHOLADITO)*100,2),' %') PORCHO, mt.EJE_PAGATODO_JAMUNDI, 
-      mt.VTM_PAGATODO_JAMUNDI, concat(round((mt.EJE_PAGATODO_JAMUNDI)/(mt.VTM_PAGATODO_JAMUNDI)*100,2),' %') PORPGT, mt.EJE_GANE5, 
-      mt.VTM_GANE5, concat(round((mt.EJE_GANE5)/(mt.VTM_GANE5)*100,2),' %') PORGN5,
-      mt.EJE_PATA_MILLONARIA, mt.VTM_PATA_MILLONARIA, concat(round((mt.EJE_PATA_MILLONARIA)/(mt.VTM_PATA_MILLONARIA)*100,2),' %') PORPTM,
-      mt.EJE_DOBLECHANCE, mt.VTM_DOBLECHANCE, concat(round((mt.EJE_DOBLECHANCE)/(mt.VTM_DOBLECHANCE)*100,2),' %') PORDBCH, 
-      mt.EJE_CHANCE_MILLONARIO, mt.VTM_CHANCE_MILLONARIO, concat(round((mt.EJE_CHANCE_MILLONARIO)/(mt.VTM_CHANCE_MILLONARIO)*100,2),' %') PORCHM, 
-      mt.EJE_ASTRO, mt.VTM_ASTRO, concat(round((mt.EJE_ASTRO)/(mt.VTM_ASTRO)*100,2),' %') PORAST, mt.EJE_LOTERIA_FISICA, 
-      mt.VTM_LOTERIA_FISICA, concat(round((mt.EJE_LOTERIA_FISICA)/(mt.VTM_LOTERIA_FISICA)*100,2),' %') PORLTF, 
-      mt.EJE_LOTERIA_VIRTUAL, mt.VTM_LOTERIA_VIRTUAL, concat(round((mt.EJE_LOTERIA_VIRTUAL)/(mt.VTM_LOTERIA_VIRTUAL)*100,2),' %') PORLTV, 
-      mt.EJE_BETPLAY, mt.VTM_BETPLAY, concat(round((mt.EJE_BETPLAY)/(mt.VTM_BETPLAY)*100,2),' %') PORBTP, 
-      mt.EJE_GIROS, mt.VTM_GIROS, concat(round((mt.EJE_GIROS)/(mt.VTM_GIROS)*100,2),' %') PORSGR, 
-      mt.EJE_SOAT, mt.VTM_SOAT, concat(round((mt.EJE_SOAT)/(mt.VTM_SOAT)*100,2),' %') PORSOAT, 
-      mt.EJE_RECAUDOS, mt.VTM_RECAUDOS, concat(round((mt.EJE_RECAUDOS)/(mt.VTM_RECAUDOS)*100,2),' %') PORECAU, 
-      mt.EJE_RECARGAS, mt.VTM_RECARGAS, concat(round((mt.EJE_RECARGAS)/(mt.VTM_RECARGAS)*100,2),' %') PORECAR, 0 PROMO1, 0 META_PROMO1, 
-      mt.EJE_RASPE, mt.VTM_RASPE, concat(round((mt.EJE_RASPE)/(mt.VTM_RASPE)*100,2),' %') PORASPE from GAMBLE.METAMES_ACUMULADO_MSR 
-      mt, GAMBLE.INFORMACION_PUNTOSVENTA np 
-    WHERE mt.SUCURSAL = ${codigo} and mt.MES=MONTH (NOW()) and FECHA=CURDATE() and mt.SUCURSAL=np.CODIGO;
+    select mp.sucursal, 
+      mp.EJE_CHANCE, mp.VTM_CHANCE, concat(round((mp.EJE_CHANCE)/(mp.VTM_CHANCE)*100,2),' %') PORCH, 
+      mp.EJE_CHOLADITO, mp.VTM_CHOLADITO, concat(round((mp.EJE_CHOLADITO)/(mp.VTM_CHOLADITO)*100,2),' %') PORCHO, mp.EJE_PAGATODO_JAMUNDI, 
+      mp.VTM_PAGATODO_JAMUNDI, concat(round((mp.EJE_PAGATODO_JAMUNDI)/(mp.VTM_PAGATODO_JAMUNDI)*100,2),' %') PORPGT, mp.EJE_GANE5, 
+      mp.VTM_GANE5, concat(round((mp.EJE_GANE5)/(mp.VTM_GANE5)*100,2),' %') PORGN5,
+      mp.EJE_PATA_MILLONARIA, mp.VTM_PATA_MILLONARIA, concat(round((mp.EJE_PATA_MILLONARIA)/(mp.VTM_PATA_MILLONARIA)*100,2),' %') PORPTM,
+      mp.EJE_DOBLECHANCE, mp.VTM_DOBLECHANCE, concat(round((mp.EJE_DOBLECHANCE)/(mp.VTM_DOBLECHANCE)*100,2),' %') PORDBCH, 
+      mp.EJE_CHANCE_MILLONARIO, mp.VTM_CHANCE_MILLONARIO, concat(round((mp.EJE_CHANCE_MILLONARIO)/(mp.VTM_CHANCE_MILLONARIO)*100,2),' %') PORCHM, 
+      mp.EJE_ASTRO, mp.VTM_ASTRO, concat(round((mp.EJE_ASTRO)/(mp.VTM_ASTRO)*100,2),' %') PORAST, mp.EJE_LOTERIA_FISICA, 
+      mp.VTM_LOTERIA_FISICA, concat(round((mp.EJE_LOTERIA_FISICA)/(mp.VTM_LOTERIA_FISICA)*100,2),' %') PORLTF, 
+      mp.EJE_LOTERIA_VIRTUAL, mp.VTM_LOTERIA_VIRTUAL, concat(round((mp.EJE_LOTERIA_VIRTUAL)/(mp.VTM_LOTERIA_VIRTUAL)*100,2),' %') PORLTV, 
+      mp.EJE_BETPLAY, mp.VTM_BETPLAY, concat(round((mp.EJE_BETPLAY)/(mp.VTM_BETPLAY)*100,2),' %') PORBTP, 
+      mp.EJE_GIROS, mp.VTM_GIROS, concat(round((mp.EJE_GIROS)/(mp.VTM_GIROS)*100,2),' %') PORSGR, 
+      mp.EJE_SOAT, mp.VTM_SOAT, concat(round((mp.EJE_SOAT)/(mp.VTM_SOAT)*100,2),' %') PORSOAT, 
+      mp.EJE_RECAUDOS, mp.VTM_RECAUDOS, concat(round((mp.EJE_RECAUDOS)/(mp.VTM_RECAUDOS)*100,2),' %') PORECAU, 
+      mp.EJE_RECARGAS, mp.VTM_RECARGAS, concat(round((mp.EJE_RECARGAS)/(mp.VTM_RECARGAS)*100,2),' %') PORECAR, 0 PROMO1, 0 META_PROMO1, 
+      mp.EJE_RASPE, mp.VTM_RASPE, concat(round((mp.EJE_RASPE)/(mp.VTM_RASPE)*100,2),' %') PORASPE from GAMBLE.METAMES_ACUMULADO_MSR 
+      mp, GAMBLE.INFORMACION_PUNTOSVENTA ip 
+    WHERE mp.SUCURSAL = ${codigo} and mp.MES=MONTH (NOW()) and FECHA=CURDATE() and mp.SUCURSAL=ip.CODIGO;
     `
   )
 
@@ -209,25 +219,25 @@ export const CumplimientoMesActualProducto = async (req, res) => {
 async function CumMesAntProdYumbo (codigo) {
   const [cumplimiento] = await pool.execute(
     `
-    select mt.sucursal, mt.EJE_CHANCE, 
-      mt.VTM_CHANCE, concat(round((mt.EJE_CHANCE)/(mt.VTM_CHANCE)*100,2),' %') PORCH,
-      mt.EJE_PAGAMAS, mt.VTM_PAGAMAS, concat(round((mt.EJE_PAGAMAS)/(mt.VTM_PAGAMAS)*100,2),' %') PORPGM,
-      mt.EJE_PAGATODO, mt.VTM_PAGATODO, concat(round((mt.EJE_PAGATODO)/(mt.VTM_PAGATODO)*100,2),' %') PORPGT, mt.EJE_GANE5,
-      mt.VTM_GANE5, concat(round((mt.EJE_GANE5)/(mt.VTM_GANE5)*100,2),' %') PORGN5, 
-      mt.EJE_PATA_MILLONARIA, mt.VTM_PATA_MILLONARIA, concat(round((mt.EJE_PATA_MILLONARIA)/(mt.VTM_PATA_MILLONARIA)*100,2),' %') PORPTM, mt.EJE_DOBLECHANCE,
-      mt.VTM_DOBLECHANCE, concat(round((mt.EJE_DOBLECHANCE)/(mt.VTM_DOBLECHANCE)*100,2),' %') PORDBCH,
-      mt.EJE_CHANCE_MILLONARIO, mt.VTM_CHANCE_MILLONARIO, concat(round((mt.EJE_CHANCE_MILLONARIO)/(mt.VTM_CHANCE_MILLONARIO)*100,2),' %') PORCHM, 
-      mt.EJE_ASTRO, mt.VTM_ASTRO, concat(round((mt.EJE_ASTRO)/(mt.VTM_ASTRO)*100,2),' %') PORAST, 
-      mt.EJE_LOTERIA_FISICA, mt.VTM_LOTERIA_FISICA, concat(round((mt.EJE_LOTERIA_FISICA)/(mt.VTM_LOTERIA_FISICA)*100,2),' %') PORLTF, mt.EJE_LOTERIA_VIRTUAL,
-      mt.VTM_LOTERIA_VIRTUAL, concat(round((mt.EJE_LOTERIA_VIRTUAL)/(mt.VTM_LOTERIA_VIRTUAL)*100,2),' %') PORLTV, 
-      mt.EJE_BETPLAY, mt.VTM_BETPLAY, concat(round((mt.EJE_BETPLAY)/(mt.VTM_BETPLAY)*100,2),' %') PORBTP, 
-      mt.EJE_GIROS, mt.VTM_GIROS, concat(round((mt.EJE_GIROS)/(mt.VTM_GIROS)*100,2),' %') PORSGR, mt.EJE_SOAT, 
-      mt.VTM_SOAT, concat(round((mt.EJE_SOAT)/(mt.VTM_SOAT)*100,2),' %') PORSOAT, mt.EJE_RECAUDOS, 
-      mt.VTM_RECAUDOS, concat(round((mt.EJE_RECAUDOS)/(mt.VTM_RECAUDOS)*100,2),' %') PORECAU,
-      mt.EJE_RECARGAS, mt.VTM_RECARGAS, concat(round((mt.EJE_RECARGAS)/(mt.VTM_RECARGAS)*100,2),' %') PORECAR, 0 PROMO1, 0 META_PROMO1,
-      mt.EJE_RASPE, mt.VTM_RASPE, concat(round((mt.EJE_RASPE)/(mt.VTM_RASPE)*100,2),' %') PORASPE
-    from GAMBLE.HIST_META_ACUMULADO mt, GAMBLE.INFORMACION_PUNTOSVENTA np 
-    WHERE mt.SUCURSAL = ${codigo} and mt.MES=MONTH(DATE_ADD(DATE_ADD(LAST_DAY(NOW()), INTERVAL 1 DAY),INTERVAL -2 MONTH)) and mt.SUCURSAL=np.codigo;
+    select mp.sucursal, mp.EJE_CHANCE, 
+      mp.VTM_CHANCE, concat(round((mp.EJE_CHANCE)/(mp.VTM_CHANCE)*100,2),' %') PORCH,
+      mp.EJE_PAGAMAS, mp.VTM_PAGAMAS, concat(round((mp.EJE_PAGAMAS)/(mp.VTM_PAGAMAS)*100,2),' %') PORPGM,
+      mp.EJE_PAGATODO, mp.VTM_PAGATODO, concat(round((mp.EJE_PAGATODO)/(mp.VTM_PAGATODO)*100,2),' %') PORPGT, mp.EJE_GANE5,
+      mp.VTM_GANE5, concat(round((mp.EJE_GANE5)/(mp.VTM_GANE5)*100,2),' %') PORGN5, 
+      mp.EJE_PATA_MILLONARIA, mp.VTM_PATA_MILLONARIA, concat(round((mp.EJE_PATA_MILLONARIA)/(mp.VTM_PATA_MILLONARIA)*100,2),' %') PORPTM, mp.EJE_DOBLECHANCE,
+      mp.VTM_DOBLECHANCE, concat(round((mp.EJE_DOBLECHANCE)/(mp.VTM_DOBLECHANCE)*100,2),' %') PORDBCH,
+      mp.EJE_CHANCE_MILLONARIO, mp.VTM_CHANCE_MILLONARIO, concat(round((mp.EJE_CHANCE_MILLONARIO)/(mp.VTM_CHANCE_MILLONARIO)*100,2),' %') PORCHM, 
+      mp.EJE_ASTRO, mp.VTM_ASTRO, concat(round((mp.EJE_ASTRO)/(mp.VTM_ASTRO)*100,2),' %') PORAST, 
+      mp.EJE_LOTERIA_FISICA, mp.VTM_LOTERIA_FISICA, concat(round((mp.EJE_LOTERIA_FISICA)/(mp.VTM_LOTERIA_FISICA)*100,2),' %') PORLTF, mp.EJE_LOTERIA_VIRTUAL,
+      mp.VTM_LOTERIA_VIRTUAL, concat(round((mp.EJE_LOTERIA_VIRTUAL)/(mp.VTM_LOTERIA_VIRTUAL)*100,2),' %') PORLTV, 
+      mp.EJE_BETPLAY, mp.VTM_BETPLAY, concat(round((mp.EJE_BETPLAY)/(mp.VTM_BETPLAY)*100,2),' %') PORBTP, 
+      mp.EJE_GIROS, mp.VTM_GIROS, concat(round((mp.EJE_GIROS)/(mp.VTM_GIROS)*100,2),' %') PORSGR, mp.EJE_SOAT, 
+      mp.VTM_SOAT, concat(round((mp.EJE_SOAT)/(mp.VTM_SOAT)*100,2),' %') PORSOAT, mp.EJE_RECAUDOS, 
+      mp.VTM_RECAUDOS, concat(round((mp.EJE_RECAUDOS)/(mp.VTM_RECAUDOS)*100,2),' %') PORECAU,
+      mp.EJE_RECARGAS, mp.VTM_RECARGAS, concat(round((mp.EJE_RECARGAS)/(mp.VTM_RECARGAS)*100,2),' %') PORECAR, 0 PROMO1, 0 META_PROMO1,
+      mp.EJE_RASPE, mp.VTM_RASPE, concat(round((mp.EJE_RASPE)/(mp.VTM_RASPE)*100,2),' %') PORASPE
+    from GAMBLE.HIST_META_ACUMULADO mp, GAMBLE.INFORMACION_PUNTOSVENTA ip 
+    WHERE mp.SUCURSAL = ${codigo} and mp.MES=MONTH(DATE_ADD(DATE_ADD(LAST_DAY(NOW()), INTERVAL 1 DAY),INTERVAL -2 MONTH)) and mp.SUCURSAL=ip.codigo;
     `
   )
 
@@ -237,24 +247,24 @@ async function CumMesAntProdYumbo (codigo) {
 async function CumMesAntProdJamundi (codigo) {
   const [cumplimiento] = await pool.execute(
     `
-    select mt.sucursal, mt.EJE_CHANCE, mt.VTM_CHANCE, concat(round((mt.EJE_CHANCE)/(mt.VTM_CHANCE)*100,2),' %') PORCH, 
-      mt.EJE_CHOLADITO, mt.VTM_CHOLADITO, concat(round((mt.EJE_CHOLADITO)/(mt.VTM_CHOLADITO)*100,2),' %') PORCHO, 
-      mt.EJE_PAGATODO_JAMUNDI, mt.VTM_PAGATODO_JAMUNDI, concat(round((mt.EJE_PAGATODO_JAMUNDI)/(mt.VTM_PAGATODO_JAMUNDI)*100,2),' %') PORPGT,
-      mt.EJE_GANE5, mt.VTM_GANE5, concat(round((mt.EJE_GANE5)/(mt.VTM_GANE5)*100,2),' %') PORGN5,
-      mt.EJE_PATA_MILLONARIA, mt.VTM_PATA_MILLONARIA, concat(round((mt.EJE_PATA_MILLONARIA)/(mt.VTM_PATA_MILLONARIA)*100,2),' %') PORPTM,
-      mt.EJE_DOBLECHANCE, mt.VTM_DOBLECHANCE, concat(round((mt.EJE_DOBLECHANCE)/(mt.VTM_DOBLECHANCE)*100,2),' %') PORDBCH,
-      mt.EJE_CHANCE_MILLONARIO, mt.VTM_CHANCE_MILLONARIO, concat(round((mt.EJE_CHANCE_MILLONARIO)/(mt.VTM_CHANCE_MILLONARIO)*100,2),' %') PORCHM,
-      mt.EJE_ASTRO, mt.VTM_ASTRO, concat(round((mt.EJE_ASTRO)/(mt.VTM_ASTRO)*100,2),' %') PORAST,
-      mt.EJE_LOTERIA_FISICA, mt.VTM_LOTERIA_FISICA, concat(round((mt.EJE_LOTERIA_FISICA)/(mt.VTM_LOTERIA_FISICA)*100,2),' %') PORLTF,
-      mt.EJE_LOTERIA_VIRTUAL, mt.VTM_LOTERIA_VIRTUAL, concat(round((mt.EJE_LOTERIA_VIRTUAL)/(mt.VTM_LOTERIA_VIRTUAL)*100,2),' %') PORLTV,
-      mt.EJE_BETPLAY, mt.VTM_BETPLAY, concat(round((mt.EJE_BETPLAY)/(mt.VTM_BETPLAY)*100,2),' %') PORBTP,
-      mt.EJE_GIROS, mt.VTM_GIROS, concat(round((mt.EJE_GIROS)/(mt.VTM_GIROS)*100,2),' %') PORSGR, 
-      mt.EJE_SOAT,mt.VTM_SOAT, concat(round((mt.EJE_SOAT)/(mt.VTM_SOAT)*100,2),' %') PORSOAT,
-      mt.EJE_RECAUDOS, mt.VTM_RECAUDOS, concat(round((mt.EJE_RECAUDOS)/(mt.VTM_RECAUDOS)*100,2),' %') PORECAU,
-      mt.EJE_RECARGAS, mt.VTM_RECARGAS, concat(round((mt.EJE_RECARGAS)/(mt.VTM_RECARGAS)*100,2),' %') PORECAR,
-      0 PROMO1, 0 META_PROMO1, mt.EJE_RASPE, mt.VTM_RASPE, concat(round((mt.EJE_RASPE)/(mt.VTM_RASPE)*100,2),' %') PORASPE
-      from GAMBLE.HIST_META_ACUMULADO mt, GAMBLE.INFORMACION_PUNTOSVENTA np 
-      WHERE mt.SUCURSAL = ${codigo} and mt.MES=MONTH(DATE_ADD(DATE_ADD(LAST_DAY(NOW()), INTERVAL 1 DAY),INTERVAL -2 MONTH)) and mt.SUCURSAL=np.codigo;
+    select mp.sucursal, mp.EJE_CHANCE, mp.VTM_CHANCE, concat(round((mp.EJE_CHANCE)/(mp.VTM_CHANCE)*100,2),' %') PORCH, 
+      mp.EJE_CHOLADITO, mp.VTM_CHOLADITO, concat(round((mp.EJE_CHOLADITO)/(mp.VTM_CHOLADITO)*100,2),' %') PORCHO, 
+      mp.EJE_PAGATODO_JAMUNDI, mp.VTM_PAGATODO_JAMUNDI, concat(round((mp.EJE_PAGATODO_JAMUNDI)/(mp.VTM_PAGATODO_JAMUNDI)*100,2),' %') PORPGT,
+      mp.EJE_GANE5, mp.VTM_GANE5, concat(round((mp.EJE_GANE5)/(mp.VTM_GANE5)*100,2),' %') PORGN5,
+      mp.EJE_PATA_MILLONARIA, mp.VTM_PATA_MILLONARIA, concat(round((mp.EJE_PATA_MILLONARIA)/(mp.VTM_PATA_MILLONARIA)*100,2),' %') PORPTM,
+      mp.EJE_DOBLECHANCE, mp.VTM_DOBLECHANCE, concat(round((mp.EJE_DOBLECHANCE)/(mp.VTM_DOBLECHANCE)*100,2),' %') PORDBCH,
+      mp.EJE_CHANCE_MILLONARIO, mp.VTM_CHANCE_MILLONARIO, concat(round((mp.EJE_CHANCE_MILLONARIO)/(mp.VTM_CHANCE_MILLONARIO)*100,2),' %') PORCHM,
+      mp.EJE_ASTRO, mp.VTM_ASTRO, concat(round((mp.EJE_ASTRO)/(mp.VTM_ASTRO)*100,2),' %') PORAST,
+      mp.EJE_LOTERIA_FISICA, mp.VTM_LOTERIA_FISICA, concat(round((mp.EJE_LOTERIA_FISICA)/(mp.VTM_LOTERIA_FISICA)*100,2),' %') PORLTF,
+      mp.EJE_LOTERIA_VIRTUAL, mp.VTM_LOTERIA_VIRTUAL, concat(round((mp.EJE_LOTERIA_VIRTUAL)/(mp.VTM_LOTERIA_VIRTUAL)*100,2),' %') PORLTV,
+      mp.EJE_BETPLAY, mp.VTM_BETPLAY, concat(round((mp.EJE_BETPLAY)/(mp.VTM_BETPLAY)*100,2),' %') PORBTP,
+      mp.EJE_GIROS, mp.VTM_GIROS, concat(round((mp.EJE_GIROS)/(mp.VTM_GIROS)*100,2),' %') PORSGR, 
+      mp.EJE_SOAT,mp.VTM_SOAT, concat(round((mp.EJE_SOAT)/(mp.VTM_SOAT)*100,2),' %') PORSOAT,
+      mp.EJE_RECAUDOS, mp.VTM_RECAUDOS, concat(round((mp.EJE_RECAUDOS)/(mp.VTM_RECAUDOS)*100,2),' %') PORECAU,
+      mp.EJE_RECARGAS, mp.VTM_RECARGAS, concat(round((mp.EJE_RECARGAS)/(mp.VTM_RECARGAS)*100,2),' %') PORECAR,
+      0 PROMO1, 0 META_PROMO1, mp.EJE_RASPE, mp.VTM_RASPE, concat(round((mp.EJE_RASPE)/(mp.VTM_RASPE)*100,2),' %') PORASPE
+      from GAMBLE.HIST_META_ACUMULADO mp, GAMBLE.INFORMACION_PUNTOSVENTA ip 
+      WHERE mp.SUCURSAL = ${codigo} and mp.MES=MONTH(DATE_ADD(DATE_ADD(LAST_DAY(NOW()), INTERVAL 1 DAY),INTERVAL -2 MONTH)) and mp.SUCURSAL=ip.codigo;
     `
   )
   return cumplimiento
