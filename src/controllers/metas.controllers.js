@@ -313,7 +313,6 @@ async function SugeridosProdJamundi (codigo, user) {
 
 export const SugeridosPrimeraConsulta = async (req, res) => {
   const { codigo, zona, user } = req.body
-
   let cumplimiento
   try {
     if (zona === 39627) {
@@ -399,7 +398,9 @@ export const SugeridosSegundaConsulta = async (req, res) => {
 async function BoletasGanadas (codigo, user) {
   const [results] = await pool.execute(
     `
-    SELECT FECHA, SUCURSAL, USUARIO, SUGERIDO1, (CUMPLIMIENTO+CUMPLIMIENTO2+CUMPLIMIENTO3+CUMPLIMIENTO4+CUMPLIMIENTO5+CUMPLIMIENTO6+CUMPLIMIENTO7+CUMPLIMIENTO8+CUMPLIMIENTO9) CANT_BOLETAS FROM CUMPLIMIENTO_SUGERIDOS_VEND where FECHA=CURDATE() AND SUCURSAL=${codigo} AND USUARIO='${user}';
+    SELECT FECHA, SUCURSAL, USUARIO, SUGERIDO1, 
+    (CUMPLIMIENTO+CUMPLIMIENTO2+CUMPLIMIENTO3+CUMPLIMIENTO4+CUMPLIMIENTO5+CUMPLIMIENTO6+CUMPLIMIENTO7+CUMPLIMIENTO8+CUMPLIMIENTO9) CANT_BOLETAS
+    FROM CUMPLIMIENTO_SUGERIDOS_VEND where FECHA=CURDATE() AND SUCURSAL=${codigo} AND USUARIO='${user}';
     `
   )
   return results
@@ -407,10 +408,10 @@ async function BoletasGanadas (codigo, user) {
 
 export const ConsultarBoletasGanas = async (req, res) => {
   const { codigo, user } = req.body
-  console.log(codigo, user)
+
   try {
-    const [response] = await BoletasGanadas(codigo, user.usuario)
-    return res.status(200).json(response)
+    const [results] = await BoletasGanadas(codigo, user)
+    return res.status(200).json(results)
   } catch (error) {
     console.log(error)
     return res.status(500).json({ message: 'Hubo un problema al obtener las boletas ganadas. Por favor, inténtalo de nuevo más tarde.' })
