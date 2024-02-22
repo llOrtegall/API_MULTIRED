@@ -75,37 +75,61 @@ export const metasDelDia = async (req, res) => {
 async function CumplimientoDiaProductoYumbo (codigo) {
   const [cumplimiento] = await pool.execute(
     `
-      select mt.sucursal, mt.CHANCE, mt.PROMEDIO_DIARIO_CHANCE, concat(round((mt.CHANCE)/(mt.PROMEDIO_DIARIO_CHANCE)*100,2),' %') PORCH, mt.PAGAMAS, mt.PROMEDIO_DIARIO_PAGAMAS, concat(round((mt.PAGAMAS)/(mt.PROMEDIO_DIARIO_PAGAMAS)*100,2),' %') PORPGM, mt.PAGATODO, mt.PROMEDIO_DIARIO_PAGATODO, concat(round((mt.PAGATODO)/(mt.PROMEDIO_DIARIO_PAGATODO)*100,2),' %') PORPGT, mt.GANE5, mt.PROMEDIO_DIARIO_GANE5, concat(round((mt.GANE5)/(mt.PROMEDIO_DIARIO_GANE5)*100,2),' %') PORGN5, mt.PATA_MILLONARIA, mt.PROMEDIO_DIARIO_PATAMI, concat(round((mt.PATA_MILLONARIA)/(mt.PROMEDIO_DIARIO_PATAMI)*100,2),' %') PORPTM, mt.DOBLECHANCE, mt.PROMEDIO_DIARIO_DOBLECHANCE, concat(round((mt.DOBLECHANCE)/(mt.PROMEDIO_DIARIO_DOBLECHANCE)*100,2),' %') PORDBCH, mt.CHANCE_MILLONARIO, mt.PROMEDIO_DIARIO_CHMILL, concat(round((mt.CHANCE_MILLONARIO)/(mt.PROMEDIO_DIARIO_CHMILL)*100,2),' %') PORCHM, mt.ASTRO, mt.PROMEDIO_DIARIO_ASTRO, concat(round((mt.ASTRO)/(mt.PROMEDIO_DIARIO_ASTRO)*100,2),' %') PORAST, mt.LOTERIA_FISICA, mt.PROMEDIO_DIARIO_LF, concat(round((mt.LOTERIA_FISICA)/(mt.PROMEDIO_DIARIO_LF)*100,2),' %') PORLTF, mt.LOTERIA_VIRTUAL, mt.PROMEDIO_DIARIO_LV, concat(round((mt.LOTERIA_VIRTUAL)/(mt.PROMEDIO_DIARIO_LV)*100,2),' %') PORLTV, mt.BETPLAY, mt.PROMEDIO_DIARIO_BETPLAY, concat(round((mt.BETPLAY)/(mt.PROMEDIO_DIARIO_BETPLAY)*100,2),' %') PORBTP, mt.GIROS, mt.PROMEDIO_DIARIO_GIROS, concat(round((mt.GIROS)/(mt.PROMEDIO_DIARIO_GIROS)*100,2),' %') PORSGR, mt.SOAT, mt.PROMEDIO_DIARIO_SOAT, concat(round((mt.SOAT)/(mt.PROMEDIO_DIARIO_SOAT)*100,2),' %') PORSOAT, mt.RECAUDOS, mt.PROMEDIO_DIARIO_RECAUDOS, concat(round((mt.RECAUDOS)/(mt.PROMEDIO_DIARIO_RECAUDOS)*100,2),' %') PORECAU, mt.RECARGAS, mt.PROMEDIO_DIARIO_RECARGAS, concat(round((mt.RECARGAS)/(mt.PROMEDIO_DIARIO_RECARGAS)*100,2),' %') PORECAR, mt.PROMO1, mt.META_PROMO1, mt.PROMO2, mt.META_PROMO2, concat(round((mt.PROMO2)/(mt.META_PROMO2)*100,2),' %') PORASPE
-  from GAMBLE.METASPRODUCTOS mt, GAMBLE.INFORMACION_PUNTOSVENTA np WHERE mt.SUCURSAL = ${codigo} and mt.FECHA=CURDATE() and mt.SUCURSAL=np.CODIGO;
-      `
+    select mp.CHANCE, mp.PROMEDIO_DIARIO_CHANCE, mp.PAGAMAS, mp.PROMEDIO_DIARIO_PAGAMAS, mp.PAGATODO, mp.PROMEDIO_DIARIO_PAGATODO,
+      mp.GANE5, mp.PROMEDIO_DIARIO_GANE5, mp.PATA_MILLONARIA, mp.PROMEDIO_DIARIO_PATAMI, mp.DOBLECHANCE, mp.PROMEDIO_DIARIO_DOBLECHANCE,
+      mp.CHANCE_MILLONARIO, mp.PROMEDIO_DIARIO_CHMILL, mp.ASTRO, mp.PROMEDIO_DIARIO_ASTRO, mp.LOTERIA_FISICA, mp.PROMEDIO_DIARIO_LF,
+      mp.LOTERIA_VIRTUAL, mp.PROMEDIO_DIARIO_LV, mp.BETPLAY, mp.PROMEDIO_DIARIO_BETPLAY, mp.GIROS, mp.PROMEDIO_DIARIO_GIROS, mp.SOAT,
+      mp.PROMEDIO_DIARIO_SOAT, mp.RECAUDOS, mp.PROMEDIO_DIARIO_RECAUDOS, mp.RECARGAS, mp.PROMEDIO_DIARIO_RECARGAS, mp.PROMO1, mp.META_PROMO1,
+      mp.PROMO2, mp.META_PROMO2
+    from 
+      METASPRODUCTOS mp,
+      INFORMACION_PUNTOSVENTA ip
+    WHERE 
+      mp.SUCURSAL = ${codigo} 
+      and mp.FECHA = CURDATE() 
+      and mp.SUCURSAL = ip.CODIGO;
+    `
   )
   return cumplimiento
 }
 async function CumplimientoDiaProductoJamundi (codigo) {
   const [cumplimiento] = await pool.execute(
-    `
-    select mt.sucursal, mt.CHANCE, mt.PROMEDIO_DIARIO_CHANCE, concat(round((mt.CHANCE)/(mt.PROMEDIO_DIARIO_CHANCE)*100,2),' %') PORCH, mt.CHOLADITO, mt.PROMEDIO_DIARIO_CHOLADITO, concat(round((mt.CHOLADITO)/(mt.PROMEDIO_DIARIO_CHOLADITO)*100,2),' %') PORPGM, mt.PAGATODO_JAMUNDI, mt.PROMEDIO_DIARIO_PGTJAMUNDI, concat(round((mt.PAGATODO_JAMUNDI)/(mt.PROMEDIO_DIARIO_PGTJAMUNDI)*100,2),' %') PORPGT, mt.GANE5, mt.PROMEDIO_DIARIO_GANE5, concat(round((mt.GANE5)/(mt.PROMEDIO_DIARIO_GANE5)*100,2),' %') PORGN5, mt.PATA_MILLONARIA, mt.PROMEDIO_DIARIO_PATAMI, concat(round((mt.PATA_MILLONARIA)/(mt.PROMEDIO_DIARIO_PATAMI)*100,2),' %') PORPTM, mt.DOBLECHANCE, mt.PROMEDIO_DIARIO_DOBLECHANCE, concat(round((mt.DOBLECHANCE)/(mt.PROMEDIO_DIARIO_DOBLECHANCE)*100,2),' %') PORDBCH, mt.CHANCE_MILLONARIO, mt.PROMEDIO_DIARIO_CHMILL, concat(round((mt.CHANCE_MILLONARIO)/(mt.PROMEDIO_DIARIO_CHMILL)*100,2),' %') PORCHM, mt.ASTRO, mt.PROMEDIO_DIARIO_ASTRO, concat(round((mt.ASTRO)/(mt.PROMEDIO_DIARIO_ASTRO)*100,2),' %') PORAST, mt.LOTERIA_FISICA, mt.PROMEDIO_DIARIO_LF, concat(round((mt.LOTERIA_FISICA)/(mt.PROMEDIO_DIARIO_LF)*100,2),' %') PORLTF, mt.LOTERIA_VIRTUAL, mt.PROMEDIO_DIARIO_LV, concat(round((mt.LOTERIA_VIRTUAL)/(mt.PROMEDIO_DIARIO_LV)*100,2),' %') PORLTV, mt.BETPLAY, mt.PROMEDIO_DIARIO_BETPLAY, concat(round((mt.BETPLAY)/(mt.PROMEDIO_DIARIO_BETPLAY)*100,2),' %') PORBTP, mt.GIROS, mt.PROMEDIO_DIARIO_GIROS, concat(round((mt.GIROS)/(mt.PROMEDIO_DIARIO_GIROS)*100,2),' %') PORSGR, mt.SOAT, mt.PROMEDIO_DIARIO_SOAT, concat(round((mt.SOAT)/(mt.PROMEDIO_DIARIO_SOAT)*100,2),' %') PORSOAT, mt.RECAUDOS, mt.PROMEDIO_DIARIO_RECAUDOS, concat(round((mt.RECAUDOS)/(mt.PROMEDIO_DIARIO_RECAUDOS)*100,2),' %') PORECAU, mt.RECARGAS, mt.PROMEDIO_DIARIO_RECARGAS, concat(round((mt.RECARGAS)/(mt.PROMEDIO_DIARIO_RECARGAS)*100,2),' %') PORECAR, mt.PROMO1, mt.META_PROMO1, mt.PROMO2, mt.META_PROMO2, concat(round((mt.PROMO2)/(mt.META_PROMO2)*100,2),' %') PORASPE from GAMBLE.METASPRODUCTOS mt, GAMBLE.INFORMACION_PUNTOSVENTA np WHERE mt.SUCURSAL = ${codigo} and mt.FECHA=CURDATE() and mt.SUCURSAL=np.CODIGO;
-    `
+  `
+    select
+      mp.CHANCE, mp.PROMEDIO_DIARIO_CHANCE, mp.CHOLADITO, mp.PROMEDIO_DIARIO_CHOLADITO, mp.PAGATODO_JAMUNDI, mp.PROMEDIO_DIARIO_PGTJAMUNDI,
+      mp.GANE5, mp.PROMEDIO_DIARIO_GANE5, mp.PATA_MILLONARIA, mp.PROMEDIO_DIARIO_PATAMI, mp.DOBLECHANCE, mp.PROMEDIO_DIARIO_DOBLECHANCE,
+      mp.CHANCE_MILLONARIO, mp.PROMEDIO_DIARIO_CHMILL, mp.ASTRO, mp.PROMEDIO_DIARIO_ASTRO, mp.LOTERIA_FISICA, mp.PROMEDIO_DIARIO_LF,
+      mp.LOTERIA_VIRTUAL, mp.PROMEDIO_DIARIO_LV, mp.BETPLAY, mp.PROMEDIO_DIARIO_BETPLAY, mp.GIROS, mp.PROMEDIO_DIARIO_GIROS, mp.SOAT,
+      mp.PROMEDIO_DIARIO_SOAT, mp.RECAUDOS, mp.PROMEDIO_DIARIO_RECAUDOS, mp.RECARGAS, mp.PROMEDIO_DIARIO_RECARGAS, mp.PROMO1, mp.META_PROMO1,
+      mp.PROMO2, mp.META_PROMO2
+    from
+      METASPRODUCTOS mp,
+      INFORMACION_PUNTOSVENTA ip
+    WHERE
+      mp.SUCURSAL = ${codigo}
+      and mp.FECHA = CURDATE()
+      and mp.SUCURSAL = ip.CODIGO;
+  `
   )
   return cumplimiento
 }
 
 export const cumplimientoDiaProducto = async (req, res) => {
-  const { codigo, zona } = req.body
+  const { codigo, zona } = req.query
   let cumplimiento
   try {
-    if (zona === 39627) {
+    if (zona === '39627') {
       [cumplimiento] = await CumplimientoDiaProductoYumbo(codigo)
       return res.status(200).json(cumplimiento)
-    } else if (zona === 39628) {
+    } else if (zona === '39628') {
       [cumplimiento] = await CumplimientoDiaProductoJamundi(codigo)
       return res.status(200).json(cumplimiento)
     } else {
-      return res.status(400).json({ message: 'Zona no encontrada' })
+      return res.status(400).json({ error: 'Zona no encontrada' })
     }
   } catch (error) {
     console.log(error)
-    return res.status(500).json({ message: 'Hubo un problema al obtener el cumplimiento del día por producto. Por favor, inténtalo de nuevo más tarde.' })
+    return res.status(500).json({ error: 'Hubo un problema al obtener el cumplimiento del día por producto. Por favor, inténtalo de nuevo más tarde.' })
   }
 }
 

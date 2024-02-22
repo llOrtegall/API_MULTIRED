@@ -7,7 +7,7 @@ RutasMetas.post('/metasLogin', metasLogin)
 
 RutasMetas.post('/metasDelDiaSucursal', metasDelDia)
 
-RutasMetas.post('/cumplimientoDiaProducto', cumplimientoDiaProducto)
+RutasMetas.get('/metarDiaxProducto', cumplimientoDiaProducto)
 
 RutasMetas.post('/infoPuntoDeVenta', infoPuntoDeVenta)
 
