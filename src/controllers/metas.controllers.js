@@ -50,8 +50,12 @@ export const infoPuntoDeVenta = async (req, res) => {
 // TODO: Para traer las metas del día
 async function BuscarMetasDelDia (codigo) {
   const [metas] = await pool.execute(
-    `select mt.sucursal, mt.CHANCE+mt.PAGAMAS+mt.PAGATODO+mt.GANE5+mt.PATA_MILLONARIA+mt.DOBLECHANCE+mt.CHANCE_MILLONARIO, mt.PROMEDIO_DIARIO_CHANCE+mt.PROMEDIO_DIARIO_PAGAMAS+mt.PROMEDIO_DIARIO_PAGATODO+mt.PROMEDIO_DIARIO_PATAMI+mt.PROMEDIO_DIARIO_DOBLECHANCE+mt.PROMEDIO_DIARIO_CHMILL, concat(round((mt.CHANCE+mt.PAGAMAS+mt.PAGATODO+mt.GANE5+mt.PATA_MILLONARIA+mt.DOBLECHANCE+mt.CHANCE_MILLONARIO)/(mt.PROMEDIO_DIARIO_CHANCE+mt.PROMEDIO_DIARIO_PAGAMAS+mt.PROMEDIO_DIARIO_PAGATODO+mt.PROMEDIO_DIARIO_PATAMI+mt.PROMEDIO_DIARIO_DOBLECHANCE+mt.PROMEDIO_DIARIO_CHMILL)*100,2),' ')
-from GAMBLE.METASPRODUCTOS mt, GAMBLE.INFORMACION_PUNTOSVENTA np WHERE mt.SUCURSAL = ${codigo} and mt.FECHA=CURDATE() and mt.SUCURSAL=np.CODIGO;`
+    `
+    select 
+      mt.CHANCE+mt.PAGAMAS+mt.PAGATODO+mt.GANE5+mt.PATA_MILLONARIA+mt.DOBLECHANCE+mt.CHANCE_MILLONARIO venta_actual,
+      mt.PROMEDIO_DIARIO_CHANCE+mt.PROMEDIO_DIARIO_PAGAMAS+mt.PROMEDIO_DIARIO_PAGATODO+mt.PROMEDIO_DIARIO_PATAMI+mt.PROMEDIO_DIARIO_DOBLECHANCE+mt.PROMEDIO_DIARIO_CHMILL asp_dia
+      from METASPRODUCTOS mt, INFORMACION_PUNTOSVENTA np WHERE mt.SUCURSAL = ${codigo} and mt.FECHA=CURDATE() and mt.SUCURSAL=np.CODIGO;
+    `
   )
   return metas
 }
@@ -60,25 +64,7 @@ export const metasDelDia = async (req, res) => {
   try {
     const [metas] = await BuscarMetasDelDia(codigo)
 
-    const NOMBRE_PDV = 'mt.CHANCE+mt.PAGAMAS+mt.PAGATODO+mt.GANE5+mt.PATA_MILLONARIA+mt.DOBLECHANCE+mt.CHANCE_MILLONARIO'
-    const META_DIARIA = 'mt.PROMEDIO_DIARIO_CHANCE+mt.PROMEDIO_DIARIO_PAGAMAS+mt.PROMEDIO_DIARIO_PAGATODO+mt.PROMEDIO_DIARIO_PATAMI+mt.PROMEDIO_DIARIO_DOBLECHANCE+mt.PROMEDIO_DIARIO_CHMILL'
-    const PORCENTAJE = 'concat(round((mt.CHANCE+mt.PAGAMAS+mt.PAGATODO+mt.GANE5+mt.PATA_MILLONARIA+mt.DOBLECHANCE+mt.CHANCE_MILLONARIO)/(mt.PROMEDIO_DIARIO_CHANCE+mt.PROMEDIO_DIARIO_PAGAMAS+mt.PROMEDIO_DIARIO_PAGATODO+mt.PROMEDIO_DIARIO_PATAMI+mt.PROMEDIO_DIARIO_DOBLECHANCE+mt.P'
-
-    const ResumenDia = {}
-
-    for (const prop in metas) {
-      if (prop === NOMBRE_PDV) {
-        ResumenDia.totalVentaDia = metas[prop]
-      } else if (prop === META_DIARIA) {
-        ResumenDia.metaDiaria = metas[prop]
-      } else if (prop.startsWith(PORCENTAJE)) {
-        ResumenDia.porcentaje = metas[prop]
-      } else {
-        ResumenDia[prop] = metas[prop]
-      }
-    }
-
-    res.status(200).json(ResumenDia)
+    res.status(200).json(metas)
   } catch (error) {
     console.error('Error al obtener las metas del día:', error)
     res.status(500).json({ message: 'Hubo un problema al obtener las metas del día. Por favor, inténtalo de ResumenDia más tarde.' })
@@ -88,7 +74,7 @@ export const metasDelDia = async (req, res) => {
 // TODO: para traer el cumplimiento del día por producto
 async function CumplimientoDiaProductoYumbo (codigo) {
   const [cumplimiento] = await pool.execute(
-      `
+    `
       select mt.sucursal, mt.CHANCE, mt.PROMEDIO_DIARIO_CHANCE, concat(round((mt.CHANCE)/(mt.PROMEDIO_DIARIO_CHANCE)*100,2),' %') PORCH, mt.PAGAMAS, mt.PROMEDIO_DIARIO_PAGAMAS, concat(round((mt.PAGAMAS)/(mt.PROMEDIO_DIARIO_PAGAMAS)*100,2),' %') PORPGM, mt.PAGATODO, mt.PROMEDIO_DIARIO_PAGATODO, concat(round((mt.PAGATODO)/(mt.PROMEDIO_DIARIO_PAGATODO)*100,2),' %') PORPGT, mt.GANE5, mt.PROMEDIO_DIARIO_GANE5, concat(round((mt.GANE5)/(mt.PROMEDIO_DIARIO_GANE5)*100,2),' %') PORGN5, mt.PATA_MILLONARIA, mt.PROMEDIO_DIARIO_PATAMI, concat(round((mt.PATA_MILLONARIA)/(mt.PROMEDIO_DIARIO_PATAMI)*100,2),' %') PORPTM, mt.DOBLECHANCE, mt.PROMEDIO_DIARIO_DOBLECHANCE, concat(round((mt.DOBLECHANCE)/(mt.PROMEDIO_DIARIO_DOBLECHANCE)*100,2),' %') PORDBCH, mt.CHANCE_MILLONARIO, mt.PROMEDIO_DIARIO_CHMILL, concat(round((mt.CHANCE_MILLONARIO)/(mt.PROMEDIO_DIARIO_CHMILL)*100,2),' %') PORCHM, mt.ASTRO, mt.PROMEDIO_DIARIO_ASTRO, concat(round((mt.ASTRO)/(mt.PROMEDIO_DIARIO_ASTRO)*100,2),' %') PORAST, mt.LOTERIA_FISICA, mt.PROMEDIO_DIARIO_LF, concat(round((mt.LOTERIA_FISICA)/(mt.PROMEDIO_DIARIO_LF)*100,2),' %') PORLTF, mt.LOTERIA_VIRTUAL, mt.PROMEDIO_DIARIO_LV, concat(round((mt.LOTERIA_VIRTUAL)/(mt.PROMEDIO_DIARIO_LV)*100,2),' %') PORLTV, mt.BETPLAY, mt.PROMEDIO_DIARIO_BETPLAY, concat(round((mt.BETPLAY)/(mt.PROMEDIO_DIARIO_BETPLAY)*100,2),' %') PORBTP, mt.GIROS, mt.PROMEDIO_DIARIO_GIROS, concat(round((mt.GIROS)/(mt.PROMEDIO_DIARIO_GIROS)*100,2),' %') PORSGR, mt.SOAT, mt.PROMEDIO_DIARIO_SOAT, concat(round((mt.SOAT)/(mt.PROMEDIO_DIARIO_SOAT)*100,2),' %') PORSOAT, mt.RECAUDOS, mt.PROMEDIO_DIARIO_RECAUDOS, concat(round((mt.RECAUDOS)/(mt.PROMEDIO_DIARIO_RECAUDOS)*100,2),' %') PORECAU, mt.RECARGAS, mt.PROMEDIO_DIARIO_RECARGAS, concat(round((mt.RECARGAS)/(mt.PROMEDIO_DIARIO_RECARGAS)*100,2),' %') PORECAR, mt.PROMO1, mt.META_PROMO1, mt.PROMO2, mt.META_PROMO2, concat(round((mt.PROMO2)/(mt.META_PROMO2)*100,2),' %') PORASPE
   from GAMBLE.METASPRODUCTOS mt, GAMBLE.INFORMACION_PUNTOSVENTA np WHERE mt.SUCURSAL = ${codigo} and mt.FECHA=CURDATE() and mt.SUCURSAL=np.CODIGO;
       `
